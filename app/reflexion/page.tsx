@@ -1,38 +1,77 @@
+'use client';
+
+import { useLanguage } from '../context/LanguageContext';
+
 export default function Reflexion() {
+  const { lang } = useLanguage();
+
   return (
     <main className="min-h-screen bg-slate-900 text-white p-8 md:p-24 flex flex-col items-center">
       <div className="max-w-5xl w-full space-y-16">
-        
         {/* Titre de la page */}
         <section className="border-b border-slate-800 pb-6">
-          <h2 className="text-3xl font-bold text-cyan-400">Réflexion & Prise de Recul</h2>
+          <h2 className="text-3xl font-bold text-cyan-400">
+            {lang === 'fr' ? 'Réflexion & Prise de Recul' : 'Engineering Mindset & Progression'}
+          </h2>
           <p className="text-slate-400 mt-2">
-            Auto-évaluation de mon parcours, de mes compétences et de ma progression vers la posture de développeur.
+            {lang === 'fr'
+              ? 'Auto-évaluation de ma progression entre le BUT 1 et le BUT 3 vers une posture d’ingénierie logicielle.'
+              : 'Self-assessment of my growth from year 1 to year 3 toward production-ready software engineering.'}
           </p>
         </section>
 
-        {/* SECTION 1 : L'ÉVOLUTION DE MA POSTURE (BUT 1 VS BUT 2) */}
+        {/* SECTION 1 : L'ÉVOLUTION DE MA POSTURE (BUT 1 -> BUT 2 -> BUT 3) */}
         <section className="space-y-6">
           <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 border-l-4 border-cyan-500 pl-3">
-            <span>📈</span> Évolution de ma Posture Professionnelle
+            <span>📈</span>
+            {lang === 'fr' ? 'Évolution de ma Posture Professionnelle' : 'Professional Growth (Year 1 to Year 3)'}
           </h3>
-          
-          <div className="grid md:grid-cols-2 gap-6 pt-2">
-            {/* Le BUT 1 */}
+
+          <div className="grid md:grid-cols-3 gap-6 pt-2">
+            {/* BUT 1 */}
             <div className="bg-slate-950 p-6 rounded-xl border border-slate-800/80">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">BUT 1 — L'Apprentissage Guidé</span>
-              <h4 className="text-lg font-bold text-slate-300 mt-1 mb-3">Exécution et Assimilation</h4>
+              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                {lang === 'fr' ? 'BUT 1 — Fondations' : 'Year 1 — Foundations'}
+              </span>
+              <h4 className="text-lg font-bold text-slate-300 mt-1 mb-3">
+                {lang === 'fr' ? 'Exécution & Algorithmique' : 'Execution & Core Algorithms'}
+              </h4>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Durant ma première année à l'IUT d'Amiens, mon travail consistait principalement à assimiler les concepts fondamentaux : l'algorithmique en C/C++, la découverte de la programmation web orientée objet et la rigueur des requêtes SQL relationnelles. Les projets étaient fortement encadrés, avec des structures de code pré-établies.
+                {lang === 'fr'
+                  ? 'Assimilation des concepts fondamentaux à l’IUT d’Amiens : algorithmique en C/C++ et C#, programmation orientée objet et bases de données SQL relationnelles sur des projets encadrés.'
+                  : 'Mastered core fundamentals at IUT d’Amiens: algorithms in C/C++ and C#, object-oriented programming, and relational SQL databases within structured academic projects.'}
               </p>
             </div>
 
-            {/* Le BUT 2 */}
-            <div className="bg-slate-950 p-6 rounded-xl border border-cyan-900/40 shadow-lg shadow-cyan-950/20">
-              <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">BUT 2 — L'Autonomie et Parcours RACA</span>
-              <h4 className="text-lg font-bold text-slate-200 mt-1 mb-3">Conception, Choix et Responsabilités</h4>
+            {/* BUT 2 */}
+            <div className="bg-slate-950 p-6 rounded-xl border border-slate-800">
+              <span className="text-xs font-semibold text-cyan-500 uppercase tracking-wider">
+                {lang === 'fr' ? 'BUT 2 — Autonomie (RACA)' : 'Year 2 — Autonomy'}
+              </span>
+              <h4 className="text-lg font-bold text-slate-200 mt-1 mb-3">
+                {lang === 'fr' ? 'Conception de A à Z' : 'End-to-End Application Design'}
+              </h4>
               <p className="text-sm text-slate-300 leading-relaxed">
-                Le BUT 2 a marqué ma transition vers une posture de concepteur autonome. Lors de mon stage pour le projet <em>Pink Studio</em>, j'ai dû assumer seul l'intégralité du cycle de développement : de l'analyse du besoin client à la modélisation UML/SQL, jusqu'à l'écriture d'un backend dynamique en PHP sécurisé. Je ne me contente plus d'écrire du code qui fonctionne, je conçois des architectures maintenables.
+                {lang === 'fr'
+                  ? 'Transition vers une posture de concepteur autonome. Lors de mon stage chez Pink Studio, j’ai assumé seul tout le cycle de vie : recueil du besoin client, modélisation SQL et développement d’un back-office PHP sécurisé.'
+                  : 'Transitioned into an autonomous developer role. During my internship at Pink Studio, I owned the entire software lifecycle solo: client requirements, SQL schema design, and a secure PHP back-office.'}
+              </p>
+            </div>
+
+            {/* BUT 3 */}
+            <div className="bg-slate-950 p-6 rounded-xl border border-cyan-700/50 shadow-lg shadow-cyan-950/30">
+              <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
+                {lang === 'fr' ? 'BUT 3 — Industrialisation' : 'Year 3 — Production Engineering'}
+              </span>
+              <h4 className="text-lg font-bold text-white mt-1 mb-3">
+                {lang === 'fr'
+                  ? 'Architectures Distribuées, Docker & Qualité'
+                  : 'Distributed Systems, Docker & Quality'}
+              </h4>
+              <p className="text-sm text-slate-300 leading-relaxed">
+                {lang === 'fr'
+                  ? 'Maîtrise des architectures modernes en équipe : Monorepos TypeScript, synchronisation temps réel (WebSockets), isolation SaaS multi-tenant (MongoDB/Express/Vue 3), tests automatisés (TDD) et déploiement Docker multi-services.'
+                  : 'Mastering modern team architectures: TypeScript Monorepos, real-time synchronization (WebSockets), multi-tenant SaaS isolation (MongoDB/Express/Vue 3), automated testing (TDD), and multi-service Docker deployments.'}
               </p>
             </div>
           </div>
@@ -41,77 +80,137 @@ export default function Reflexion() {
         {/* SECTION 2 : SYNTHÈSE DES COMPÉTENCES DU PARCOURS RACA */}
         <section className="space-y-6">
           <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2 border-l-4 border-cyan-500 pl-3">
-            <span>🛠️</span> Alignement avec le Référentiel National (RACA)
+            <span>🛠️</span>
+            {lang === 'fr'
+              ? 'Compétences Clés Validées (Parcours Réalisation d’Applications)'
+              : 'Core Software Engineering Competencies'}
           </h3>
-          
-          <p className="text-slate-400 text-sm max-w-3xl leading-relaxed">
-            Le parcours <strong>Réalisation d'Applications : Conception, Développement, Validation</strong> impose des exigences strictes en matière de qualité logicielle. Voici comment mes réalisations concrétisent ces apprentissages critiques :
-          </p>
 
           <div className="space-y-4">
             {/* Compétence 1 */}
             <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold text-cyan-500 uppercase">Compétence 1 — Développement Qualitatif</span>
-                <h4 className="text-base font-bold text-slate-200">Implémentation d'architectures dynamiques et sécurisées</h4>
-                <p className="text-xs text-slate-400 max-w-2xl">
-                  Traduit par la mise en place d'un espace d'administration complet (CRUD) en PHP natif pour le salon de tatouage, incluant la validation stricte des données et la gestion sécurisée des téléversements de fichiers.
+                <span className="text-xs font-bold text-cyan-500 uppercase">
+                  {lang === 'fr'
+                    ? 'Compétence 1 — Réaliser & Industrialiser'
+                    : 'Competency 1 — Full-Stack Development & Containerization'}
+                </span>
+                <h4 className="text-base font-bold text-slate-200">
+                  {lang === 'fr'
+                    ? 'Architectures Full-Stack, Temps Réel et Conteneurisation Docker'
+                    : 'Full-Stack, Real-Time & Dockerized Application Architectures'}
+                </h4>
+                <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+                  {lang === 'fr'
+                    ? 'Conception du SaaS TaskFlow (Vue 3, Express 5, MongoDB 8, Dockerfile multi-stage), du MMORPG 2D (React, PixiJS, WebSocket, Nginx) et du back-office Pink Studio.'
+                    : 'Built TaskFlow SaaS (Vue 3, Express 5, MongoDB 8, multi-stage Dockerfile), the 2D MMORPG (React, PixiJS, WebSocket, Nginx), and the Pink Studio CRUD platform.'}
                 </p>
               </div>
-              <span className="bg-cyan-950/40 text-cyan-400 text-xs font-medium px-2.5 py-1 rounded border border-cyan-800/30 self-start md:self-center">
-                Validé (Stage)
+              <span className="bg-cyan-950/40 text-cyan-400 text-xs font-medium px-2.5 py-1 rounded border border-cyan-800/30 self-start md:self-center shrink-0">
+                {lang === 'fr' ? 'Validé (BUT 2 & BUT 3)' : 'Validated (Years 2 & 3)'}
               </span>
             </div>
 
             {/* Compétence 2 */}
             <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold text-cyan-500 uppercase">Compétence 2 — Conception et Optimisation</span>
-                <h4 className="text-base font-bold text-slate-200">Modélisation de données et gestion d'environnements</h4>
-                <p className="text-xs text-slate-400 max-w-2xl">
-                  Création de bases de données relationnelles optimisées sous MySQL, intégrant des tables associatives pour lier dynamiquement les œuvres, les styles et les artistes sans redondance d'information.
+                <span className="text-xs font-bold text-cyan-500 uppercase">
+                  {lang === 'fr'
+                    ? 'Compétence 2 — Optimiser & Administrer les Données'
+                    : 'Competency 2 — Data Architecture & Optimization'}
+                </span>
+                <h4 className="text-base font-bold text-slate-200">
+                  {lang === 'fr'
+                    ? 'Modélisation SQL (PostgreSQL/MySQL), NoSQL Multi-Tenant (MongoDB) & Algorithmique'
+                    : 'Relational SQL (PostgreSQL/MySQL), Multi-Tenant NoSQL (MongoDB) & Algorithms'}
+                </h4>
+                <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+                  {lang === 'fr'
+                    ? 'Isolation multi-entreprise par plugin Mongoose et JWT/RBAC sur TaskFlow, persistance PostgreSQL sur le MMORPG, et algorithmique avancée en Python (cryptanalyse MCMC, traitement multimédia).'
+                    : 'Multi-tenant data isolation via custom Mongoose plugin and JWT/RBAC on TaskFlow, PostgreSQL persistence for the MMORPG, and advanced Python algorithms (MCMC cryptanalysis, image processing).'}
                 </p>
               </div>
-              <span className="bg-cyan-950/40 text-cyan-400 text-xs font-medium px-2.5 py-1 rounded border border-cyan-800/30 self-start md:self-center">
-                Validé (Projet Solo)
+              <span className="bg-cyan-950/40 text-cyan-400 text-xs font-medium px-2.5 py-1 rounded border border-cyan-800/30 self-start md:self-center shrink-0">
+                {lang === 'fr' ? 'Validé (BUT 3)' : 'Validated (Year 3)'}
               </span>
             </div>
 
             {/* Compétence 3 */}
             <div className="bg-slate-950 p-5 rounded-xl border border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <span className="text-xs font-bold text-cyan-500 uppercase">Compétence 3 — Collaboration Technique</span>
-                <h4 className="text-base font-bold text-slate-200">Travail en équipe agile et gestion des versions</h4>
-                <p className="text-xs text-slate-400 max-w-2xl">
-                  Développement en binôme de la plateforme automobile en mode freelance. Utilisation intensive de Git (branches, fusions, résolution de conflits) et répartition méthodique du travail selon un cahier des charges client réel.
+                <span className="text-xs font-bold text-cyan-500 uppercase">
+                  {lang === 'fr'
+                    ? 'Compétence 3 — Qualité Logicielle & Collaboration Agile'
+                    : 'Competency 3 — Software Quality & Agile Collaboration'}
+                </span>
+                <h4 className="text-base font-bold text-slate-200">
+                  {lang === 'fr'
+                    ? 'Monorepos TypeScript, Tests Automatisés (TDD) et Git Flow en Équipe'
+                    : 'TypeScript Monorepos, Automated Testing (TDD) & Team Git Workflows'}
+                </h4>
+                <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+                  {lang === 'fr'
+                    ? 'Mise en œuvre sur Bomberman Arena et le MMORPG 2D : contrats d’interfaces partagés (shared/), tests unitaires et d’intégration automatisés, linting strict et gestion des branches (main / develop / feat/*).'
+                    : 'Applied on Bomberman Arena and the 2D MMORPG: shared interface contracts (shared/), automated unit and integration test suites, strict linting, and structured branching (main / develop / feat/*).'}
                 </p>
               </div>
-              <span className="bg-amber-950/40 text-amber-400 text-xs font-medium px-2.5 py-1 rounded border border-amber-800/30 self-start md:self-center">
-                En cours (Freelance)
+              <span className="bg-emerald-950/40 text-emerald-400 text-xs font-medium px-2.5 py-1 rounded border border-emerald-800/30 self-start md:self-center shrink-0">
+                {lang === 'fr' ? 'Validé (Projets Équipe BUT 3)' : 'Validated (Year 3 Team Projects)'}
               </span>
             </div>
           </div>
         </section>
 
-        {/* SECTION 3 : MA PHILOSOPHIE DU CODE & PERSPECTIVES */}
+        {/* SECTION 3 : MA PHILOSOPHIE DU CODE & PERSPECTIVES 2027 */}
         <section className="bg-slate-950 p-8 rounded-2xl border border-slate-800 space-y-6">
           <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-            <span>🎯</span> Bilan et Perspectives d'Avenir
+            <span>🎯</span>
+            {lang === 'fr' ? 'Bilan et Perspectives 2027' : 'Outlook & 2027 Career Goals'}
           </h3>
-          
+
           <div className="space-y-4 text-sm text-slate-300 leading-relaxed">
-            <p>
-              Mon parcours en BUT Informatique m'a permis d'ancrer une valeur fondamentale dans ma pratique quotidienne : <strong>le souci du détail</strong>. Comme évoqué dans ma présentation, mon exigence quant à la propreté du code et l'organisation rigoureuse des arborescences de fichiers est passée d'un simple automatisme à un véritable atout professionnel. Un code propre est un code qui dure, qui se maintient facilement et qui s'intègre sans friction au sein d'une équipe.
-            </p>
-            <p>
-              Fort de mes expériences en développement natif (PHP, C, SQL), j'ai également compris l'importance de m'ouvrir aux écosystèmes modernes. Mon appropriation de frameworks comme <strong>Next.js</strong> et de bibliothèques utilitaires comme <strong>Tailwind CSS</strong> pour concevoir ce portfolio témoigne de ma flexibilité technologique.
-            </p>
-            <p>
-              <strong>Pour la suite :</strong> À court terme, mon objectif est de consolider ma spécialisation RACA lors de ma troisième année de BUT, idéalement en alternance. À plus long terme, j'envisage une poursuite d'études vers un Master ou un titre d'ingénieur afin d'approfondir la conception d'architectures logicielles complexes, avec une forte ambition de travailler, à terme, dans des contextes internationaux ou en totale autonomie freelance.
-            </p>
+            {lang === 'fr' ? (
+              <>
+                <p>
+                  Mon parcours en BUT Informatique a ancré une conviction forte dans ma pratique :{' '}
+                  <strong>un bon logiciel est un logiciel lisible, testé et reproductible</strong>. Mon exigence pour
+                  le <em>clean code</em>, le typage fort (TypeScript) et la conteneurisation systématique (Docker
+                  Compose) permet à n&apos;importe quel membre d&apos;une équipe de lancer et faire évoluer un projet
+                  sans friction.
+                </p>
+                <p>
+                  <strong>Objectif Mars – Juin 2027 :</strong> Dans le cadre de la fin de ma 3ème année de BUT, je
+                  recherche un <strong>stage de 13 semaines (du 1er mars au 4 juin 2027)</strong>. Je souhaite
+                  vivement réaliser cette expérience à l&apos;international — en particulier en{' '}
+                  <strong className="text-cyan-400">Pologne</strong> ou au{' '}
+                  <strong className="text-cyan-400">Portugal</strong> (avec le soutien du programme{' '}
+                  <strong>Erasmus+</strong>) — ou au sein d&apos;une équipe technique ambitieuse en{' '}
+                  <strong className="text-cyan-400">France</strong>, avant de poursuivre mes études vers un Master ou
+                  un diplôme d&apos;ingénieur en architecture logicielle.
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  My Computer Science degree has shaped a core conviction in my daily work:{' '}
+                  <strong>great software is readable, tested, and reproducible</strong>. My commitment to{' '}
+                  <em>clean code</em>, strict TypeScript typing, and systematic Docker containerization ensures that
+                  any engineering team member can spin up, test, and extend a service without friction.
+                </p>
+                <p>
+                  <strong>March – June 2027 Goal:</strong> To complete my 3rd year of B.Sc., I am actively looking for
+                  a <strong>13-week internship (March 1 – June 4, 2027)</strong>. I am highly motivated to complete
+                  this internship internationally — especially in{' '}
+                  <strong className="text-cyan-400">Poland</strong> or{' '}
+                  <strong className="text-cyan-400">Portugal</strong> (supported by an{' '}
+                  <strong>Erasmus+ mobility grant</strong>) — or within an ambitious software team in{' '}
+                  <strong className="text-cyan-400">France</strong>, before pursuing a Master&apos;s degree in Software
+                  Engineering.
+                </p>
+              </>
+            )}
           </div>
         </section>
-
       </div>
     </main>
   );

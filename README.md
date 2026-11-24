@@ -1,36 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Portfolio — Côme Vermeulen (BUT 3 Informatique / B.Sc. in Computer Science)
 
-## Getting Started
+🌐 **Site en ligne / Live Website :** [https://portfolio-but2.vercel.app](https://portfolio-but2.vercel.app)  
+🇬🇧 **English direct link :** [https://portfolio-but2.vercel.app/?lang=en](https://portfolio-but2.vercel.app/?lang=en)
 
-First, run the development server:
+Portfolio universitaire et professionnel bilingue (**FR / EN**) développé avec **Next.js 16 (App Router)**, **React 19**, **TypeScript** et **Tailwind CSS 4**.
+
+## 🚀 Projets présentés / Featured Projects
+
+1. **[MMORPG 2D Temps Réel — Mythologie Grecque](https://github.com/Meqle/SAE-BUT3-mmorpg-mythologie-grecque)** (`TypeScript Monorepo`, `React`, `PixiJS`, `Node.js`, `WebSocket`, `PostgreSQL`, `Docker Compose`, `Nginx`)
+2. **[Bomberman Arena](https://github.com/Luzzz17/bomberman-arena)** (`TypeScript Monorepo`, `Electron`, `Node.js`, `Socket.io`, `Docker`, `TDD / Automated Tests`)
+3. **[TaskFlow — Plateforme SaaS Multi-Entreprise](https://github.com/Meqle/TaskFlow_Projet_SaaS)** (`Vue 3`, `Node.js / Express 5`, `MongoDB 8 / Mongoose`, `JWT & RBAC`, `Multi-Stage Docker`)
+4. **Pink Studio Amiens — Site Web & Back-Office Administrateur** (`PHP`, `MySQL`, `HTML5/CSS3`, `CRUD`)
+
+## 🎯 Recherche de Stage (1er Mars – 4 Juin 2027 / March 1 – June 4, 2027)
+
+- **Durée / Duration :** 13 semaines (3 mois / 3 months)
+- **Domaines / Roles :** Full-Stack Developer, Backend Developer, Software Engineer Intern
+- **Mobilité / Locations :**
+  - 🌍 **International (Priorité / Priority) :** Pologne (Varsovie, Cracovie, Wrocław, Gdańsk) & Portugal (Lisbonne, Porto) — *Éligible bourse Erasmus+ / Erasmus+ Funded*
+  - 🇫🇷 **France :** Amiens, Lille, Paris
+
+## 🛠️ Lancement local / Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
