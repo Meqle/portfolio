@@ -1,13 +1,11 @@
 import './globals.css'
 import React from 'react'
-import Navbar from './components/Navbar'
-import Footer from './components/Footer'
 import { LanguageProvider } from './context/LanguageContext'
 
 export const metadata = {
-  title: 'Portfolio — Côme Vermeulen | Full-Stack Developer (BUT 3)',
+  title: 'Côme Vermeulen — Développeur Full-Stack & Logiciel',
   description:
-    'Portfolio de Côme Vermeulen, étudiant en BUT 3 Informatique (RACA) — Développeur Full-Stack & Backend (TypeScript, React, Next.js, Vue 3, Node.js, Docker, SQL/NoSQL). Recherche stage mars-juin 2027.',
+    'Portfolio de Côme Vermeulen, étudiant en troisième année de BUT Informatique. Architectures TypeScript, Node.js, temps réel, SaaS et Docker.',
 }
 
 export default function RootLayout({
@@ -16,16 +14,10 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
-      <body className="bg-slate-900 antialiased flex flex-col min-h-screen">
+    <html lang="fr" className="dark">
+      <body className="bg-zinc-950 text-zinc-100 antialiased selection:bg-cyan-500/20 selection:text-cyan-300">
         <LanguageProvider>
-          <Navbar />
-
-          <div className="pt-16 flex-grow flex flex-col">
-            {children}
-          </div>
-
-          <Footer />
+          {children}
         </LanguageProvider>
       </body>
     </html>

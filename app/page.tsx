@@ -1,172 +1,1401 @@
 'use client';
 
-import Link from 'next/link';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import Navbar from './components/Navbar';
 import { useLanguage } from './context/LanguageContext';
 
-export default function Home() {
+export default function PortfolioDeck() {
   const { lang } = useLanguage();
+  const [activeSection, setActiveSection] = useState(0);
+  const [activeProject, setActiveProject] = useState(0);
+  const [activePinkTab, setActivePinkTab] = useState(0);
+  const [hoverProgress, setHoverProgress] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 500, y: 300 });
 
-  const techBadges = [
-    'TypeScript',
-    'React / Next.js',
-    'Vue 3',
-    'Node.js (Express / Socket.io)',
-    'Docker & Compose',
-    'PostgreSQL / MongoDB',
-    'Electron / PixiJS',
-    'PHP / MySQL',
-    'Python / C#',
-    'Git / TDD',
-  ];
+  const [formState, setFormState] = useState({ name: '', email: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
+
+  const sectionRefs = useRef<(HTMLElement | null)[]>([]);
+  const hoverTimerRef = useRef<number | null>(null);
+
+  const sections =
+    lang === 'fr'
+      ? [
+          { id: 'intro', num: '01', label: 'Introduction' },
+          { id: 'projets', num: '02', label: 'Réalisations' },
+          { id: 'architecture', num: '03', label: 'Stack & Architecture' },
+          { id: 'parcours', num: '04', label: 'Parcours' },
+          { id: 'contact', num: '05', label: 'Contact' },
+        ]
+      : [
+          { id: 'intro', num: '01', label: 'Overview' },
+          { id: 'projets', num: '02', label: 'Selected Work' },
+          { id: 'architecture', num: '03', label: 'Stack & Systems' },
+          { id: 'parcours', num: '04', label: 'Background' },
+          { id: 'contact', num: '05', label: 'Contact' },
+        ];
+
+  const scrollToSection = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(index, 4));
+    const el = sectionRefs.current[clamped];
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveSection(clamped);
+    }
+  }, []);
+
+  // Mouse spotlight tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // IntersectionObserver to sync activeSection on scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const idx = Number(entry.target.getAttribute('data-index'));
+            if (!Number.isNaN(idx)) {
+              setActiveSection(idx);
+            }
+          }
+        });
+      },
+      { threshold: 0.45 }
+    );
+
+    sectionRefs.current.forEach((sec) => {
+      if (sec) observer.observe(sec);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Keyboard navigation (ArrowDown / ArrowUp / PageDown / PageUp)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+      if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+        if (activeSection < 4) {
+          e.preventDefault();
+          scrollToSection(activeSection + 1);
+        }
+      } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+        if (activeSection > 0) {
+          e.preventDefault();
+          scrollToSection(activeSection - 1);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeSection, scrollToSection]);
+
+  // Bottom hover zone auto-advance ("pointer la souris vers le bas pour passer à l'écran suivant")
+  const handleBottomZoneEnter = () => {
+    if (activeSection >= 4) return;
+    const startTime = performance.now();
+    const duration = 550; // ms before gliding to next section
+
+    const tick = (now: number) => {
+      const elapsed = now - startTime;
+      const pct = Math.min(100, (elapsed / duration) * 100);
+      setHoverProgress(pct);
+      if (pct < 100) {
+        hoverTimerRef.current = requestAnimationFrame(tick);
+      } else {
+        setHoverProgress(0);
+        scrollToSection(activeSection + 1);
+      }
+    };
+
+    hoverTimerRef.current = requestAnimationFrame(tick);
+  };
+
+  const handleBottomZoneLeave = () => {
+    if (hoverTimerRef.current) {
+      cancelAnimationFrame(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    setHoverProgress(0);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: 'd6f70cfb-73bf-4c05-8b71-919a846daf33',
+          name: formState.name,
+          email: formState.email,
+          message: formState.message,
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        setSubmitted(true);
+        setFormState({ name: '', email: '', message: '' });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const projects =
+    lang === 'fr'
+      ? [
+          {
+            num: '01',
+            title: 'MMORPG 2D Temps Réel',
+            subtitle: 'Monorepo TypeScript, WebSocket & Moteur 2D PixiJS',
+            year: '2026',
+            context: 'Projet BUT 3',
+            repo: 'https://github.com/Meqle/SAE-BUT3-mmorpg-mythologie-grecque',
+            stack: ['TypeScript', 'React', 'PixiJS', 'Node.js', 'WebSocket', 'PostgreSQL', 'Docker Compose', 'Nginx'],
+            summary:
+              "Conception d'un jeu de rôle multijoueur en ligne mêlant exploration en vue de dessus et phases de plateforme en vue de profil. Le projet repose sur une architecture Monorepo garantissant le partage strict des contrats de typage entre le client graphique et le serveur temps réel.",
+            points: [
+              {
+                label: 'Contrat réseau partagé',
+                text: "Module TypeScript commun définissant l'ensemble des paquets, états de salles et entités synchronisées entre le client et le serveur.",
+              },
+              {
+                label: 'Serveur temps réel & anti-abus',
+                text: "Synchronisation basse latence par WebSocket avec gestion des salons, contrôle de cadence des paquets et limitation de taille des messages.",
+              },
+              {
+                label: 'Isolation Docker & Reverse Proxy',
+                text: 'Seul le conteneur Nginx est exposé sur la machine hôte ; il relaie les flux HTTP et WebSocket vers le serveur Node.js isolé sur le réseau interne.',
+              },
+            ],
+            archNodes: [
+              { title: 'Client Web', detail: 'React · Vite · PixiJS WebGL' },
+              { title: 'Reverse Proxy', detail: 'Nginx :8080 · HTTP & WS' },
+              { title: 'Serveur Temps Réel', detail: 'Node.js :3001 · Salles & État' },
+              { title: 'Persistance & Types', detail: 'PostgreSQL · packages/shared' },
+            ],
+            command: 'docker compose up --build',
+          },
+          {
+            num: '02',
+            title: 'Bomberman Arena',
+            subtitle: 'Client Desktop Electron, Serveur Autoritaire & Tests Automatisés',
+            year: '2026',
+            context: 'Qualité de Développement BUT 3',
+            repo: 'https://github.com/Luzzz17/bomberman-arena',
+            stack: ['TypeScript', 'Electron', 'Node.js', 'Socket.io', 'Docker', 'Tests Unitaires & Intégration'],
+            summary:
+              "Développement d'un jeu d'arène multijoueur en réseau axé sur l'ingénierie de la qualité logicielle. La logique du jeu s'exécute intégralement sur un serveur autoritaire conteneurisé afin de garantir la cohérence de l'état de la partie entre les clients de bureau Electron.",
+            points: [
+              {
+                label: 'Moteur serveur autoritaire',
+                text: 'Calcul centralisé des déplacements, collisions, explosions en chaîne et apparitions de bonus sur le serveur Node.js / Socket.io.',
+              },
+              {
+                label: 'Protocole réseau spécifié',
+                text: 'Documentation technique formelle du protocole WebSocket et partage des constantes via un module commun au sein du monorepo.',
+              },
+              {
+                label: 'Couverture de tests & validation',
+                text: "Suites de tests unitaires et d'intégration dédiées côté client et côté serveur, associées au linting et à la vérification stricte du typage.",
+              },
+            ],
+            archNodes: [
+              { title: 'Client Desktop', detail: 'Electron · TypeScript' },
+              { title: 'Protocole Partagé', detail: 'shared/ · Contrats Socket.io' },
+              { title: 'Serveur Autoritaire', detail: 'Node.js 22 · Conteneur Docker' },
+              { title: 'Pipeline Qualité', detail: 'Tests Unitaires · Linter · Typecheck' },
+            ],
+            command: 'npm --prefix server test && npm --prefix client run typecheck',
+          },
+          {
+            num: '03',
+            title: 'TaskFlow SaaS',
+            subtitle: 'Plateforme Kanban Multi-Entreprise avec Isolation NoSQL',
+            year: '2026',
+            context: 'Architecture SaaS & NoSQL BUT 3',
+            repo: 'https://github.com/Meqle/TaskFlow_Projet_SaaS',
+            stack: ['Vue 3', 'Node.js', 'Express 5', 'MongoDB 8', 'Mongoose', 'JWT & RBAC', 'Docker Multi-Stage'],
+            summary:
+              "Application web SaaS permettant à plusieurs entreprises clientes de gérer leurs projets et tableaux Kanban sur une même instance applicative tout en garantissant un cloisonnement strict des données entre organisations.",
+            points: [
+              {
+                label: 'Cloisonnement Multi-Tenant',
+                text: "Plugin Mongoose d'isolation automatique filtrant chaque requête selon l'identifiant d'entreprise extrait du contexte d'authentification.",
+              },
+              {
+                label: 'Contrôle d’accès par rôles',
+                text: "Authentification par jetons JWT et gestion granulaire des permissions sur trois niveaux : super-administrateur plateforme, administrateur d'entreprise et membre.",
+              },
+              {
+                label: 'Build Docker multi-étapes',
+                text: "Compilation de l'interface Vue 3 puis assemblage du serveur Express dans une image unique, orchestrée avec MongoDB 8, test de disponibilité et initialisation automatique.",
+              },
+            ],
+            archNodes: [
+              { title: 'Interface Kanban', detail: 'Vue 3 · Vite · SortableJS' },
+              { title: 'Sécurité API', detail: 'Express 5 · JWT · Rôles RBAC' },
+              { title: 'Isolation Tenant', detail: 'Plugin Mongoose par entreprise' },
+              { title: 'Base Documentaire', detail: 'MongoDB 8 · Index & Seed auto' },
+            ],
+            command: 'docker compose up -d --build',
+          },
+          {
+            num: '04',
+            title: 'Pink Studio Amiens',
+            subtitle: 'Plateforme Web Dynamique & Back-Office Administrateur',
+            year: '2026',
+            context: 'Stage de BUT 2 en autonomie',
+            repo: null,
+            stack: ['PHP', 'MySQL', 'Architecture Modulaire', 'HTML5 & CSS3', 'CRUD Administrateur'],
+            summary:
+              "Réalisation complète en autonomie du site vitrine dynamique et de l'interface d'administration d'un salon de tatouage lors de mon stage de deuxième année. Prise en charge de l'ensemble du cycle, du recueil du besoin client à la mise en place de la base relationnelle.",
+            points: [
+              {
+                label: 'Administration complète',
+                text: "Création d'un back-office sécurisé permettant au gérant d'administrer les artistes, les styles et la galerie d'œuvres avec validation des fichiers téléversés.",
+              },
+              {
+                label: 'Modélisation relationnelle',
+                text: 'Base de données MySQL normalisée reposant sur des tables associatives pour croiser dynamiquement artistes et styles sans redondance.',
+              },
+              {
+                label: 'Filtrage dynamique',
+                text: 'Galerie publique fluide générée côté serveur avec système de filtres combinés et architecture CSS structurée par variables globales.',
+              },
+            ],
+            archNodes: [],
+            command: null,
+          },
+        ]
+      : [
+          {
+            num: '01',
+            title: 'Real-Time 2D MMORPG',
+            subtitle: 'TypeScript Monorepo, WebSocket Server & PixiJS 2D Engine',
+            year: '2026',
+            context: '3rd-Year Capstone Project',
+            repo: 'https://github.com/Meqle/SAE-BUT3-mmorpg-mythologie-grecque',
+            stack: ['TypeScript', 'React', 'PixiJS', 'Node.js', 'WebSocket', 'PostgreSQL', 'Docker Compose', 'Nginx'],
+            summary:
+              'Browser-based multiplayer 2D role-playing game combining top-down world exploration and side-scrolling platformer phases. Architected as a TypeScript monorepo enforcing compile-time type contracts between the WebGL client and the real-time server.',
+            points: [
+              {
+                label: 'Shared network contracts',
+                text: 'Dedicated shared package defining all packet schemas, room states, and entity interfaces across client and server.',
+              },
+              {
+                label: 'Low-latency synchronization',
+                text: 'Custom WebSocket server managing multi-room state synchronization, packet rate limiting, and payload size guards.',
+              },
+              {
+                label: 'Isolated Docker topology',
+                text: 'Only the Nginx reverse-proxy container is exposed on the host, relaying HTTP and WebSocket streams to the internal Node.js service.',
+              },
+            ],
+            archNodes: [
+              { title: 'Web Client', detail: 'React · Vite · PixiJS WebGL' },
+              { title: 'Reverse Proxy', detail: 'Nginx :8080 · HTTP & WS' },
+              { title: 'Game Server', detail: 'Node.js :3001 · Rooms & State' },
+              { title: 'Data & Contracts', detail: 'PostgreSQL · packages/shared' },
+            ],
+            command: 'docker compose up --build',
+          },
+          {
+            num: '02',
+            title: 'Bomberman Arena',
+            subtitle: 'Electron Desktop Client, Authoritative Server & Automated Testing',
+            year: '2026',
+            context: 'Software Quality Engineering',
+            repo: 'https://github.com/Luzzz17/bomberman-arena',
+            stack: ['TypeScript', 'Electron', 'Node.js', 'Socket.io', 'Docker', 'Unit & Integration Tests'],
+            summary:
+              'Networked multiplayer arena game built with a strict focus on software quality engineering. All game physics and rules run on an authoritative Dockerized server to ensure deterministic state synchronization across Electron desktop clients.',
+            points: [
+              {
+                label: 'Authoritative server engine',
+                text: 'Server-side computation of grid movement, collisions, chain explosions, and power-up spawns using Node.js and Socket.io.',
+              },
+              {
+                label: 'Formal protocol specification',
+                text: 'Documented WebSocket communication protocol paired with shared TypeScript constants across the monorepo.',
+              },
+              {
+                label: 'Automated quality gates',
+                text: 'Unit and integration test suites for both server and client packages, backed by strict linting and static type checking.',
+              },
+            ],
+            archNodes: [
+              { title: 'Desktop Client', detail: 'Electron · TypeScript' },
+              { title: 'Shared Protocol', detail: 'shared/ · Socket.io Contracts' },
+              { title: 'Authoritative Server', detail: 'Node.js 22 · Docker Container' },
+              { title: 'Quality Pipeline', detail: 'Unit Tests · Linter · Typecheck' },
+            ],
+            command: 'npm --prefix server test && npm --prefix client run typecheck',
+          },
+          {
+            num: '03',
+            title: 'TaskFlow SaaS',
+            subtitle: 'Multi-Tenant Kanban Platform with NoSQL Data Isolation',
+            year: '2026',
+            context: 'SaaS & NoSQL Architecture',
+            repo: 'https://github.com/Meqle/TaskFlow_Projet_SaaS',
+            stack: ['Vue 3', 'Node.js', 'Express 5', 'MongoDB 8', 'Mongoose', 'JWT & RBAC', 'Multi-Stage Docker'],
+            summary:
+              'Multi-company SaaS project management application featuring an interactive drag-and-drop Kanban board. Designed to serve multiple client organizations from a single deployment with strict tenant data isolation.',
+            points: [
+              {
+                label: 'Multi-tenant isolation',
+                text: 'Custom Mongoose plugin and request middlewares automatically scoping every database operation to the authenticated company context.',
+              },
+              {
+                label: 'Role-based access control',
+                text: 'JWT authentication with three hierarchical permission tiers: platform super-admin, company admin, and team member.',
+              },
+              {
+                label: 'Multi-stage Docker build',
+                text: 'Single-command deployment compiling the Vue 3 frontend, packaging the Express 5 API, verifying MongoDB 8 healthchecks, and seeding initial data.',
+              },
+            ],
+            archNodes: [
+              { title: 'Kanban SPA', detail: 'Vue 3 · Vite · SortableJS' },
+              { title: 'API Security', detail: 'Express 5 · JWT · RBAC Roles' },
+              { title: 'Tenant Scoping', detail: 'Custom Mongoose Isolation Plugin' },
+              { title: 'Document Store', detail: 'MongoDB 8 · Auto Index & Seed' },
+            ],
+            command: 'docker compose up -d --build',
+          },
+          {
+            num: '04',
+            title: 'Pink Studio Amiens',
+            subtitle: 'Dynamic Web Platform & Custom Admin Back-Office',
+            year: '2026',
+            context: '2nd-Year Internship · Sole Developer',
+            repo: null,
+            stack: ['PHP', 'MySQL', 'Modular Architecture', 'HTML5 & CSS3', 'Admin CRUD'],
+            summary:
+              'End-to-end design and development of a dynamic showcase platform and administration back-office during my second-year internship. Delivered autonomously from client requirements and SQL schema design to deployment.',
+            points: [
+              {
+                label: 'Custom CRUD back-office',
+                text: 'Authenticated administration interface enabling the studio manager to manage artists, styles, and gallery items with validated image uploads.',
+              },
+              {
+                label: 'Relational database schema',
+                text: 'Normalized MySQL schema using associative junction tables to link artists, styles, and artworks without data redundancy.',
+              },
+              {
+                label: 'Dynamic multi-filter gallery',
+                text: 'Server-rendered public gallery with multi-criteria filtering and a maintainable CSS architecture built on custom properties.',
+              },
+            ],
+            archNodes: [],
+            command: null,
+          },
+        ];
+
+  const pinkScreenshots =
+    lang === 'fr'
+      ? [
+          {
+            label: '01. Galerie publique',
+            src: '/site-galerie.png',
+            caption: 'Rendu côté client avec filtrage dynamique par artiste et par style depuis MySQL.',
+          },
+          {
+            label: '02. Back-office CRUD',
+            src: '/site-admin.png',
+            caption: "Interface d'administration sécurisée pour l'ajout d'œuvres, d'artistes et de styles.",
+          },
+          {
+            label: '03. Structure du code',
+            src: '/vscode-architecture.png',
+            caption: 'Séparation modulaire des scripts de traitement PHP et variables CSS globales.',
+          },
+          {
+            label: '04. Schéma relationnel',
+            src: '/phpmyadmin.png',
+            caption: 'Modélisation MySQL incluant les tables entités et la table associative pivot.',
+          },
+        ]
+      : [
+          {
+            label: '01. Public Gallery',
+            src: '/site-galerie.png',
+            caption: 'Public gallery view featuring dynamic multi-criteria filtering powered by MySQL.',
+          },
+          {
+            label: '02. Admin CRUD',
+            src: '/site-admin.png',
+            caption: 'Authenticated administration dashboard for managing artworks, artists, and styles.',
+          },
+          {
+            label: '03. Code Structure',
+            src: '/vscode-architecture.png',
+            caption: 'Modular separation of PHP processing scripts and global CSS custom properties.',
+          },
+          {
+            label: '04. Relational Schema',
+            src: '/phpmyadmin.png',
+            caption: 'Normalized MySQL database schema showing entity tables and associative junction table.',
+          },
+        ];
+
+  const currentProject = projects[activeProject];
 
   return (
-    <main className="min-h-[calc(100vh-4rem)] bg-slate-900 text-white flex flex-col items-center justify-center px-6 md:px-16 py-12">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12 lg:gap-20 my-auto animate-fade-in w-full">
-        {/* BLOC GAUCHE : Photo de Profil */}
-        <div className="flex-shrink-0 relative w-48 h-48 sm:w-56 sm:h-56 md:w-72 md:h-72 lg:w-80 lg:h-80">
-          <div className="absolute -inset-2 bg-cyan-500 rounded-full blur opacity-25 animate-pulse"></div>
+    <div className="relative min-h-screen bg-zinc-950 text-zinc-100">
+      {/* Halo subtil qui suit le curseur */}
+      <div
+        className="pointer-events-none fixed inset-0 z-10 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(34, 211, 238, 0.045), transparent 45%)`,
+        }}
+      />
 
-          <div className="relative w-full h-full rounded-full overflow-hidden border-4 border-slate-800 bg-slate-950 shadow-2xl">
-            <Image
-              src="/come-photo.jpg"
-              alt="Photo de Côme Vermeulen"
-              layout="fill"
-              objectFit="cover"
-              priority
-              className="transition-transform duration-300 hover:scale-105"
+      {/* Barre supérieure minimaliste */}
+      <Navbar activeSection={activeSection} onSelectSection={scrollToSection} sections={sections} />
+
+      {/* Rail vertical de navigation à droite (Desktop) */}
+      <aside className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col items-end gap-3">
+        {sections.map((sec, idx) => {
+          const isActive = activeSection === idx;
+          return (
+            <button
+              key={sec.id}
+              type="button"
+              onClick={() => scrollToSection(idx)}
+              className="group flex items-center gap-3 py-1 focus:outline-none"
+              aria-label={sec.label}
+            >
+              <span
+                className={`text-[11px] font-mono transition-all duration-200 ${
+                  isActive
+                    ? 'opacity-100 text-zinc-200 translate-x-0'
+                    : 'opacity-0 group-hover:opacity-100 text-zinc-500 translate-x-2 group-hover:translate-x-0'
+                }`}
+              >
+                {sec.num} · {sec.label}
+              </span>
+              <span
+                className={`block transition-all duration-300 rounded-full ${
+                  isActive
+                    ? 'w-2 h-6 bg-cyan-400'
+                    : 'w-1.5 h-1.5 bg-zinc-700 group-hover:bg-zinc-400'
+                }`}
+              />
+            </button>
+          );
+        })}
+      </aside>
+
+      {/* ===================================================================
+          ÉCRAN 01 : INTRODUCTION
+         =================================================================== */}
+      <section
+        id="intro"
+        data-index={0}
+        ref={(el) => {
+          sectionRefs.current[0] = el;
+        }}
+        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-20 pb-24 border-b border-zinc-900"
+      >
+        <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-12 gap-12 items-center">
+          {/* Colonne Texte (8 colonnes) */}
+          <div className="lg:col-span-8 space-y-8">
+            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="font-mono text-[11px] text-emerald-400 uppercase tracking-wider">
+                {lang === 'fr' ? 'Stage 2027' : '2027 Internship'}
+              </span>
+              <span className="text-zinc-700">|</span>
+              <span>
+                {lang === 'fr'
+                  ? 'Disponible du 1er mars au 4 juin 2027 · Pologne, Portugal (Erasmus+) & France'
+                  : 'Available March 1 – June 4, 2027 · Poland, Portugal (Erasmus+) & France'}
+              </span>
+            </div>
+
+            <div className="space-y-4">
+              <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+                {lang === 'fr'
+                  ? '01 / Introduction — BUT 3 Informatique · IUT d’Amiens'
+                  : '01 / Overview — 3rd-Year B.Sc. in Computer Science · France'}
+              </p>
+              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-zinc-100 leading-[1.08]">
+                Côme Vermeulen
+              </h1>
+              <p className="text-xl sm:text-2xl text-zinc-400 font-normal max-w-2xl leading-snug">
+                {lang === 'fr'
+                  ? 'Développeur Full-Stack & Logiciel, spécialisé dans les architectures TypeScript, les systèmes temps réel et la conteneurisation Docker.'
+                  : 'Full-Stack & Software Developer specializing in TypeScript architectures, real-time networked systems, and Dockerized environments.'}
+              </p>
+            </div>
+
+            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed max-w-2xl">
+              {lang === 'fr'
+                ? "Étudiant en troisième année de BUT Informatique (parcours Réalisation d'Applications), je conçois des applications web et logicielles structurées : monorepos TypeScript, serveurs WebSocket autoritaires, plateformes SaaS multi-entreprises et déploiements reproductibles sous Docker."
+                : 'Final-year Computer Science undergraduate focusing on Application Development. I build structured web and desktop software: TypeScript monorepos, authoritative WebSocket servers, multi-tenant SaaS platforms, and reproducible multi-container Docker deployments.'}
+            </p>
+
+            {/* Actions rapides */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <button
+                type="button"
+                onClick={() => scrollToSection(1)}
+                className="bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs sm:text-sm px-5 py-3 rounded-md transition-colors"
+              >
+                {lang === 'fr' ? 'Explorer mes réalisations' : 'Explore selected work'}
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollToSection(4)}
+                className="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-medium text-xs sm:text-sm px-5 py-3 rounded-md border border-zinc-800 transition-colors"
+              >
+                {lang === 'fr' ? 'Me contacter pour un stage' : 'Contact for internship'}
+              </button>
+              <a
+                href="https://github.com/Meqle"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-zinc-400 hover:text-zinc-200 px-3 py-3 transition-colors"
+              >
+                github.com/Meqle ↗
+              </a>
+            </div>
+
+            {/* Métriques / Repères sobres */}
+            <div className="pt-8 border-t border-zinc-900 grid grid-cols-2 sm:grid-cols-4 gap-6">
+              <div>
+                <div className="font-mono text-xs text-zinc-500">
+                  {lang === 'fr' ? 'Formation' : 'Degree'}
+                </div>
+                <div className="text-sm font-medium text-zinc-200 mt-1">
+                  {lang === 'fr' ? 'BUT 3 Informatique' : 'B.Sc. Computer Science'}
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-xs text-zinc-500">
+                  {lang === 'fr' ? 'Dominante' : 'Focus'}
+                </div>
+                <div className="text-sm font-medium text-zinc-200 mt-1">Full-Stack & Temps Réel</div>
+              </div>
+              <div>
+                <div className="font-mono text-xs text-zinc-500">
+                  {lang === 'fr' ? 'Mobilité 2027' : '2027 Mobility'}
+                </div>
+                <div className="text-sm font-medium text-zinc-200 mt-1">
+                  {lang === 'fr' ? 'Pologne · Portugal · France' : 'Poland · Portugal · France'}
+                </div>
+              </div>
+              <div>
+                <div className="font-mono text-xs text-zinc-500">
+                  {lang === 'fr' ? 'Durée de stage' : 'Internship Window'}
+                </div>
+                <div className="text-sm font-medium text-zinc-200 mt-1">
+                  {lang === 'fr' ? '13 semaines (Mars – Juin)' : '13 weeks (Mar – Jun)'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Colonne Portrait sobre (4 colonnes) */}
+          <div className="lg:col-span-4 flex justify-center lg:justify-end">
+            <div className="relative w-56 h-64 sm:w-64 sm:h-72 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900 shadow-2xl">
+              <Image
+                src="/come-photo.jpg"
+                alt="Côme Vermeulen"
+                fill
+                sizes="(max-width: 768px) 224px, 256px"
+                priority
+                className="object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-500"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/40 to-transparent p-4">
+                <p className="font-mono text-[11px] text-zinc-300">Côme Vermeulen</p>
+                <p className="font-mono text-[10px] text-zinc-500">Amiens, France</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          ÉCRAN 02 : RÉALISATIONS (WORKBENCH INTERACTIF)
+         =================================================================== */}
+      <section
+        id="projets"
+        data-index={1}
+        ref={(el) => {
+          sectionRefs.current[1] = el;
+        }}
+        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-zinc-900"
+      >
+        <div className="max-w-6xl mx-auto w-full space-y-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-900 pb-5">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+                {lang === 'fr' ? '02 / Réalisations sélectionnées' : '02 / Selected Work'}
+              </p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+                {lang === 'fr' ? 'Projets & Architectures' : 'Projects & System Architectures'}
+              </h2>
+            </div>
+            <p className="text-xs font-mono text-zinc-500">
+              {lang === 'fr'
+                ? 'Survolez ou cliquez sur un projet pour inspecter son architecture'
+                : 'Hover or click a project to inspect its architecture'}
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-8 items-start">
+            {/* Liste des 4 projets à gauche (4 colonnes) */}
+            <div className="lg:col-span-4 flex flex-col gap-2">
+              {projects.map((proj, idx) => {
+                const isSelected = activeProject === idx;
+                return (
+                  <button
+                    key={proj.num}
+                    type="button"
+                    onMouseEnter={() => setActiveProject(idx)}
+                    onClick={() => setActiveProject(idx)}
+                    className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
+                      isSelected
+                        ? 'bg-zinc-900/90 border-zinc-700 shadow-lg'
+                        : 'bg-zinc-950 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/30'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between text-xs font-mono">
+                      <span className={isSelected ? 'text-cyan-400 font-semibold' : 'text-zinc-600'}>
+                        {proj.num}
+                      </span>
+                      <span className="text-zinc-500">{proj.context}</span>
+                    </div>
+                    <h3
+                      className={`text-base font-semibold mt-1.5 transition-colors ${
+                        isSelected ? 'text-zinc-100' : 'text-zinc-400'
+                      }`}
+                    >
+                      {proj.title}
+                    </h3>
+                    <p className="text-xs text-zinc-500 mt-1 line-clamp-1">{proj.subtitle}</p>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Panneau de détail interactif à droite (8 colonnes) */}
+            <div className="lg:col-span-8 bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 sm:p-8 space-y-6">
+              {/* En-tête du projet sélectionné */}
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-zinc-800/80 pb-5">
+                <div>
+                  <div className="flex items-center gap-2 font-mono text-xs text-cyan-400">
+                    <span>{currentProject.num}</span>
+                    <span>/</span>
+                    <span>{currentProject.context}</span>
+                    <span>·</span>
+                    <span>{currentProject.year}</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-zinc-100 mt-1">{currentProject.title}</h3>
+                  <p className="text-sm text-zinc-400 mt-0.5">{currentProject.subtitle}</p>
+                </div>
+
+                {currentProject.repo && (
+                  <a
+                    href={currentProject.repo}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 inline-flex items-center gap-2 bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs px-4 py-2.5 rounded-md transition-colors"
+                  >
+                    <span>{lang === 'fr' ? 'Dépôt GitHub' : 'GitHub Repository'}</span>
+                    <span>↗</span>
+                  </a>
+                )}
+              </div>
+
+              {/* Stack technique sobre */}
+              <div className="flex flex-wrap gap-1.5">
+                {currentProject.stack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="font-mono text-[11px] bg-zinc-950 text-zinc-300 px-2.5 py-1 rounded border border-zinc-800"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+
+              {/* Résumé */}
+              <p className="text-sm text-zinc-300 leading-relaxed">{currentProject.summary}</p>
+
+              {/* 3 Points d'ingénierie */}
+              <div className="grid sm:grid-cols-3 gap-4">
+                {currentProject.points.map((pt) => (
+                  <div key={pt.label} className="bg-zinc-950/80 border border-zinc-800/80 rounded-lg p-4 space-y-1.5">
+                    <h4 className="text-xs font-semibold text-zinc-200">{pt.label}</h4>
+                    <p className="text-xs text-zinc-400 leading-relaxed">{pt.text}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Module visuel : Schéma d'architecture (Projets 01-03) ou Visionneuse de captures (Projet 04) */}
+              {currentProject.archNodes.length > 0 ? (
+                <div className="bg-zinc-950 border border-zinc-800/90 rounded-lg p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                      {lang === 'fr' ? 'Topologie & Flux Applicatif' : 'System Topology & Data Flow'}
+                    </span>
+                    {currentProject.command && (
+                      <code className="font-mono text-[11px] text-cyan-400 bg-zinc-900 px-2.5 py-0.5 rounded border border-zinc-800">
+                        $ {currentProject.command}
+                      </code>
+                    )}
+                  </div>
+
+                  <div className="grid sm:grid-cols-4 gap-2.5">
+                    {currentProject.archNodes.map((node, i) => (
+                      <div
+                        key={node.title}
+                        className="relative bg-zinc-900/70 border border-zinc-800 rounded-md p-3 flex flex-col justify-between"
+                      >
+                        <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-1">
+                          <span>0{i + 1}</span>
+                          {i < currentProject.archNodes.length - 1 && (
+                            <span className="hidden sm:inline text-zinc-600">→</span>
+                          )}
+                        </div>
+                        <div className="text-xs font-semibold text-zinc-200">{node.title}</div>
+                        <div className="text-[11px] font-mono text-zinc-400 mt-1">{node.detail}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-zinc-950 border border-zinc-800/90 rounded-lg p-4 space-y-4">
+                  {/* Sélecteur d'aperçus Pink Studio */}
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                      {lang === 'fr' ? 'Captures du projet' : 'Project Screenshots'}
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {pinkScreenshots.map((shot, sIdx) => (
+                        <button
+                          key={shot.label}
+                          type="button"
+                          onClick={() => setActivePinkTab(sIdx)}
+                          className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                            activePinkTab === sIdx
+                              ? 'bg-zinc-100 text-zinc-950 font-semibold'
+                              : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                          }`}
+                        >
+                          {shot.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="relative h-56 sm:h-64 w-full rounded border border-zinc-800 bg-zinc-900 overflow-hidden">
+                    <Image
+                      src={pinkScreenshots[activePinkTab].src}
+                      alt={pinkScreenshots[activePinkTab].label}
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 700px"
+                      className="object-contain p-2"
+                    />
+                  </div>
+                  <p className="text-xs text-zinc-400 font-mono">{pinkScreenshots[activePinkTab].caption}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          ÉCRAN 03 : STACK & ARCHITECTURE
+         =================================================================== */}
+      <section
+        id="architecture"
+        data-index={2}
+        ref={(el) => {
+          sectionRefs.current[2] = el;
+        }}
+        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-zinc-900"
+      >
+        <div className="max-w-6xl mx-auto w-full space-y-10">
+          <div className="border-b border-zinc-900 pb-5">
+            <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+              {lang === 'fr' ? '03 / Compétences Techniques' : '03 / Technical Capabilities'}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+              {lang === 'fr' ? 'Stack Technique & Pratiques d’Ingénierie' : 'Tech Stack & Engineering Practices'}
+            </h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* Pôle 1 */}
+            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
+              <div className="font-mono text-xs text-cyan-400">01 / FRONTEND & CLIENTS</div>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {lang === 'fr' ? 'Interfaces Web & Desktop' : 'Web & Desktop Interfaces'}
+              </h3>
+              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>TypeScript / ES2024</span>
+                  <span className="text-zinc-500">{lang === 'fr' ? 'Principal' : 'Primary'}</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>React / Next.js</span>
+                  <span className="text-zinc-500">App Router</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Vue 3</span>
+                  <span className="text-zinc-500">Vite · SPA</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Electron</span>
+                  <span className="text-zinc-500">Desktop</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>PixiJS · Tailwind CSS</span>
+                  <span className="text-zinc-500">2D · UI</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Pôle 2 */}
+            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
+              <div className="font-mono text-xs text-cyan-400">02 / BACKEND & RÉSEAU</div>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {lang === 'fr' ? 'Serveurs, API & Temps Réel' : 'Servers, APIs & Real-Time'}
+              </h3>
+              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Node.js / Express 5</span>
+                  <span className="text-zinc-500">REST API</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>WebSocket / Socket.io</span>
+                  <span className="text-zinc-500">{lang === 'fr' ? 'Temps réel' : 'Real-Time'}</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Python</span>
+                  <span className="text-zinc-500">Algo · Scripts</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>C# / .NET · Java</span>
+                  <span className="text-zinc-500">OOP</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>PHP · C / C++</span>
+                  <span className="text-zinc-500">Backend · Sys</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Pôle 3 */}
+            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
+              <div className="font-mono text-xs text-cyan-400">03 / DONNÉES</div>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {lang === 'fr' ? 'Bases SQL & NoSQL' : 'SQL & NoSQL Databases'}
+              </h3>
+              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>PostgreSQL</span>
+                  <span className="text-zinc-500">PL/pgSQL</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>MongoDB 8</span>
+                  <span className="text-zinc-500">Mongoose</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>MySQL / MariaDB</span>
+                  <span className="text-zinc-500">Relationnel</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Isolation Multi-Tenant</span>
+                  <span className="text-zinc-500">SaaS</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>JWT & Rôles RBAC</span>
+                  <span className="text-zinc-500">Sécurité</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Pôle 4 */}
+            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
+              <div className="font-mono text-xs text-cyan-400">04 / DEVOPS & QUALITÉ</div>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {lang === 'fr' ? 'Industrialisation & Tests' : 'Containers & Testing'}
+              </h3>
+              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Docker & Compose</span>
+                  <span className="text-zinc-500">Multi-Stage</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Monorepo Workspaces</span>
+                  <span className="text-zinc-500">Shared Types</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Tests Automatisés</span>
+                  <span className="text-zinc-500">TDD · BDD</span>
+                </li>
+                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                  <span>Nginx</span>
+                  <span className="text-zinc-500">Reverse Proxy</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Git / GitHub · Linux</span>
+                  <span className="text-zinc-500">Git Flow</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Synthèse méthodologique sobre */}
+          <div className="grid md:grid-cols-3 gap-5 pt-2">
+            <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-5 space-y-2">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                {lang === 'fr' ? 'Environnements Reproductibles' : 'Reproducible Environments'}
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {lang === 'fr'
+                  ? 'Chaque projet récent est configuré pour démarrer en une seule commande Docker Compose, avec vérification de disponibilité des bases de données et isolation réseau des services.'
+                  : 'Every recent project is configured to spin up with a single Docker Compose command, complete with database healthchecks and internal service network isolation.'}
+              </p>
+            </div>
+            <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-5 space-y-2">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                {lang === 'fr' ? 'Contrats de Typage Stricts' : 'Strict Type Contracts'}
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {lang === 'fr'
+                  ? 'Utilisation d’architectures Monorepo permettant de partager les schémas de données et protocoles WebSocket entre le client et le serveur sans duplication.'
+                  : 'Monorepo workspace structures sharing data schemas and WebSocket protocols directly between client and server packages without duplication.'}
+              </p>
+            </div>
+            <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-5 space-y-2">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+                {lang === 'fr' ? 'Algorithmique & Modélisation' : 'Algorithms & Modeling'}
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {lang === 'fr'
+                  ? 'Solide bagage en algorithmique et modélisation mathématique en Python : méthodes d’optimisation, cryptanalyse par chaînes de Markov (MCMC) et traitement du signal et de l’image.'
+                  : 'Strong foundation in Python algorithmic modeling: optimization methods, Markov Chain Monte Carlo cryptanalysis, and digital image processing.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          ÉCRAN 04 : PARCOURS & EXPÉRIENCES
+         =================================================================== */}
+      <section
+        id="parcours"
+        data-index={3}
+        ref={(el) => {
+          sectionRefs.current[3] = el;
+        }}
+        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-zinc-900"
+      >
+        <div className="max-w-6xl mx-auto w-full space-y-10">
+          <div className="border-b border-zinc-900 pb-5">
+            <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+              {lang === 'fr' ? '04 / Parcours & Évolution' : '04 / Background & Progression'}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+              {lang === 'fr' ? 'Formation & Expériences' : 'Education & Experience'}
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-10">
+            {/* Colonne Formation */}
+            <div className="space-y-6">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+                {lang === 'fr' ? 'Cursus Universitaire' : 'Academic Background'}
+              </h3>
+
+              <div className="space-y-6 border-l border-zinc-800 pl-6">
+                <div className="relative space-y-1.5">
+                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-cyan-400" />
+                  <div className="font-mono text-xs text-cyan-400">2024 – 2027</div>
+                  <h4 className="text-base font-semibold text-zinc-100">
+                    {lang === 'fr'
+                      ? 'BUT Informatique — Parcours Réalisation d’Applications'
+                      : 'B.Sc. in Computer Science (BUT Informatique)'}
+                  </h4>
+                  <p className="text-xs text-zinc-400">
+                    {lang === 'fr'
+                      ? 'IUT d’Amiens, Université de Picardie Jules Verne — Actuellement en 3ème année'
+                      : 'IUT d’Amiens, France — Currently in 3rd and final year'}
+                  </p>
+                  <p className="text-xs text-zinc-400 leading-relaxed pt-1">
+                    {lang === 'fr'
+                      ? 'Conception logicielle, architectures distribuées, virtualisation et conteneurisation Docker, bases de données relationnelles et NoSQL, qualité de développement et tests automatisés.'
+                      : 'Software architecture, distributed systems, Docker containerization, relational and NoSQL databases, software quality engineering, and automated testing.'}
+                  </p>
+                </div>
+
+                <div className="relative space-y-1.5">
+                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-zinc-700" />
+                  <div className="font-mono text-xs text-zinc-500">2023 – 2024</div>
+                  <h4 className="text-base font-semibold text-zinc-200">
+                    {lang === 'fr'
+                      ? 'Classe Préparatoire Intégrée — EPITA'
+                      : 'Integrated Engineering Preparatory Class — EPITA'}
+                  </h4>
+                  <p className="text-xs text-zinc-400">
+                    {lang === 'fr'
+                      ? 'École d’Ingénieurs en Informatique — Semestre intensif'
+                      : 'Graduate School of Computer Science — Intensive semester'}
+                  </p>
+                  <p className="text-xs text-zinc-400 leading-relaxed pt-1">
+                    {lang === 'fr'
+                      ? 'Acquisition d’une forte rigueur mathématique et algorithmique, programmation fonctionnelle en OCaml et bases de l’architecture système.'
+                      : 'Strong mathematical and algorithmic rigor, functional programming in OCaml, and systems fundamentals.'}
+                  </p>
+                </div>
+
+                <div className="relative space-y-1.5">
+                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-zinc-700" />
+                  <div className="font-mono text-xs text-zinc-500">2023</div>
+                  <h4 className="text-base font-semibold text-zinc-200">
+                    {lang === 'fr' ? 'Baccalauréat Général' : 'French High School Diploma'}
+                  </h4>
+                  <p className="text-xs text-zinc-400">
+                    {lang === 'fr'
+                      ? 'Spécialités Mathématiques et Numérique & Sciences Informatiques'
+                      : 'Specializations in Mathematics and Computer Science'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Colonne Expériences & Progression */}
+            <div className="space-y-6">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+                {lang === 'fr' ? 'Expériences en Entreprise' : 'Professional Experience'}
+              </h3>
+
+              <div className="space-y-4">
+                <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-5 space-y-2">
+                  <div className="flex items-center justify-between font-mono text-xs">
+                    <span className="text-cyan-400">
+                      {lang === 'fr' ? 'Janvier – Mars 2026 · 8 semaines' : 'Jan – Mar 2026 · 8 weeks'}
+                    </span>
+                    <span className="text-zinc-500">Amiens, France</span>
+                  </div>
+                  <h4 className="text-base font-semibold text-zinc-100">
+                    {lang === 'fr'
+                      ? 'Développeur Web Full-Stack Stagiaire — Pink Studio'
+                      : 'Full-Stack Web Developer Intern — Pink Studio'}
+                  </h4>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    {lang === 'fr'
+                      ? "Conception et livraison en autonomie complète de la plateforme web de l'entreprise : recueil des besoins auprès du dirigeant, modélisation de la base de données MySQL, développement du back-office d'administration sécurisé et de la galerie publique."
+                      : 'Designed and delivered the company web platform as sole developer: requirements gathering with the business owner, MySQL database design, secure CRUD administration back-office, and dynamic public gallery.'}
+                  </p>
+                </div>
+
+                <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 space-y-2">
+                  <div className="flex items-center justify-between font-mono text-xs text-zinc-500">
+                    <span>2024 & 2026</span>
+                    <span>France</span>
+                  </div>
+                  <h4 className="text-sm font-semibold text-zinc-300">
+                    {lang === 'fr'
+                      ? 'Expériences Saisonnières — Intermarché & McDonald’s'
+                      : 'Seasonal Employment — Intermarché & McDonald’s'}
+                  </h4>
+                  <p className="text-xs text-zinc-400 leading-relaxed">
+                    {lang === 'fr'
+                      ? 'Travail en équipe sous cadence soutenue, rigueur d’organisation et autonomie opérationnelle.'
+                      : 'Fast-paced teamwork, operational rigor, and reliability in high-demand environments.'}
+                  </p>
+                </div>
+
+                {/* Progression 3 ans */}
+                <div className="bg-zinc-900/20 border border-zinc-800/70 rounded-xl p-5 space-y-3">
+                  <div className="font-mono text-xs text-zinc-400 uppercase tracking-wider">
+                    {lang === 'fr' ? 'Progression sur les 3 années du BUT' : '3-Year Engineering Progression'}
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 text-xs">
+                    <div className="space-y-1">
+                      <div className="font-mono text-zinc-500">01 · BUT 1</div>
+                      <div className="font-medium text-zinc-300">
+                        {lang === 'fr' ? 'Fondations algorithmiques & SQL' : 'Core algorithms & SQL'}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-mono text-zinc-500">02 · BUT 2</div>
+                      <div className="font-medium text-zinc-300">
+                        {lang === 'fr' ? 'Autonomie complète en stage' : 'Full-stack autonomy'}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-mono text-cyan-400">03 · BUT 3</div>
+                      <div className="font-medium text-zinc-100">
+                        {lang === 'fr' ? 'Systèmes distribués, Docker & Tests' : 'Distributed systems & Docker'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ===================================================================
+          ÉCRAN 05 : CONTACT & STAGE 2027
+         =================================================================== */}
+      <section
+        id="contact"
+        data-index={4}
+        ref={(el) => {
+          sectionRefs.current[4] = el;
+        }}
+        className="relative min-h-screen flex flex-col justify-between px-6 sm:px-12 lg:px-24 pt-20 pb-12"
+      >
+        <div className="max-w-6xl mx-auto w-full my-auto space-y-10">
+          <div className="border-b border-zinc-900 pb-5">
+            <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+              {lang === 'fr' ? '05 / Contact & Mobilité 2027' : '05 / Contact & 2027 Internship'}
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+              {lang === 'fr' ? 'Échanger autour d’une opportunité de stage' : 'Discuss an Internship Opportunity'}
+            </h2>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-10 items-start">
+            {/* Informations Stage & Coordonnées (5 colonnes) */}
+            <div className="lg:col-span-5 space-y-6">
+              <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                  <span className="font-mono text-xs uppercase tracking-wider text-emerald-400">
+                    {lang === 'fr'
+                      ? 'Recherche de stage : 1er mars – 4 juin 2027'
+                      : 'Internship search: March 1 – June 4, 2027'}
+                  </span>
+                </div>
+
+                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                  {lang === 'fr'
+                    ? 'Dans le cadre de la validation de ma troisième année de BUT Informatique, je recherche un stage de 13 semaines en développement Full-Stack, Backend ou Logiciel.'
+                    : 'To complete my third year of B.Sc. in Computer Science, I am seeking a 13-week internship in Full-Stack, Backend, or Software Engineering.'}
+                </p>
+
+                <div className="space-y-2 pt-2 border-t border-zinc-800/80 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 font-mono">
+                      {lang === 'fr' ? 'Mobilité Europe' : 'European Mobility'}
+                    </span>
+                    <span className="text-zinc-200 font-medium">
+                      {lang === 'fr' ? 'Pologne · Portugal (Bourse Erasmus+)' : 'Poland · Portugal (Erasmus+ Grant)'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 font-mono">
+                      {lang === 'fr' ? 'Mobilité France' : 'France'}
+                    </span>
+                    <span className="text-zinc-200 font-medium">Amiens · Lille · Paris</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500 font-mono">
+                      {lang === 'fr' ? 'Langues de travail' : 'Working Languages'}
+                    </span>
+                    <span className="text-zinc-200 font-medium">
+                      {lang === 'fr' ? 'Français · Anglais' : 'English · French'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 space-y-4 text-xs">
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+                  <span className="font-mono text-zinc-500">Email</span>
+                  <a
+                    href="mailto:vermeulen.come@gmail.com"
+                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                  >
+                    vermeulen.come@gmail.com
+                  </a>
+                </div>
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+                  <span className="font-mono text-zinc-500">
+                    {lang === 'fr' ? 'Téléphone' : 'Phone'}
+                  </span>
+                  <a
+                    href="tel:+33769951415"
+                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                  >
+                    +33 7 69 95 14 15
+                  </a>
+                </div>
+                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
+                  <span className="font-mono text-zinc-500">GitHub</span>
+                  <a
+                    href="https://github.com/Meqle"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                  >
+                    github.com/Meqle ↗
+                  </a>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-zinc-500">LinkedIn</span>
+                  <a
+                    href="https://www.linkedin.com/in/c%C3%B4me-vermeulen-4b601a38b/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                  >
+                    linkedin.com/in/côme-vermeulen ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Formulaire direct (7 colonnes) */}
+            <div className="lg:col-span-7">
+              <form
+                onSubmit={handleSubmit}
+                className="bg-zinc-900/30 border border-zinc-800/90 rounded-xl p-6 sm:p-8 space-y-5"
+              >
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="block font-mono text-[11px] uppercase text-zinc-400">
+                      {lang === 'fr' ? 'Nom / Entreprise' : 'Name / Company'}
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      required
+                      value={formState.name}
+                      onChange={(e) => setFormState({ ...formState, name: e.target.value })}
+                      placeholder={lang === 'fr' ? 'Votre nom ou organisation' : 'Your name or company'}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block font-mono text-[11px] uppercase text-zinc-400">
+                      {lang === 'fr' ? 'Adresse email' : 'Email address'}
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      value={formState.email}
+                      onChange={(e) => setFormState({ ...formState, email: e.target.value })}
+                      placeholder="contact@company.com"
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="message" className="block font-mono text-[11px] uppercase text-zinc-400">
+                    Message
+                  </label>
+                  <textarea
+                    id="message"
+                    required
+                    rows={5}
+                    value={formState.message}
+                    onChange={(e) => setFormState({ ...formState, message: e.target.value })}
+                    placeholder={
+                      lang === 'fr'
+                        ? 'Proposition de stage, échange technique...'
+                        : 'Internship opportunity, technical inquiry...'
+                    }
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between gap-4">
+                  <button
+                    type="submit"
+                    className="bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs sm:text-sm px-6 py-3 rounded-md transition-colors"
+                  >
+                    {lang === 'fr' ? 'Envoyer le message' : 'Send message'}
+                  </button>
+
+                  {submitted && (
+                    <span className="font-mono text-xs text-emerald-400">
+                      {lang === 'fr' ? 'Message envoyé avec succès.' : 'Message sent successfully.'}
+                    </span>
+                  )}
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Pied de page minimaliste intégré au dernier écran */}
+        <footer className="max-w-6xl mx-auto w-full pt-12 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
+          <div>Côme Vermeulen — {lang === 'fr' ? 'IUT d’Amiens' : 'Amiens, France'}</div>
+          <button
+            type="button"
+            onClick={() => scrollToSection(0)}
+            className="hover:text-zinc-300 transition-colors"
+          >
+            {lang === 'fr' ? 'Retour en haut ↑' : 'Back to top ↑'}
+          </button>
+        </footer>
+      </section>
+
+      {/* ===================================================================
+          CAPTEUR DE NAVIGATION EN BAS D'ÉCRAN (POINTAGE SOURIS / CLIC)
+         =================================================================== */}
+      {activeSection < 4 && (
+        <div
+          onMouseEnter={handleBottomZoneEnter}
+          onMouseLeave={handleBottomZoneLeave}
+          onClick={() => scrollToSection(activeSection + 1)}
+          className="fixed bottom-0 inset-x-0 z-40 h-12 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent cursor-pointer flex flex-col justify-end group"
+        >
+          <div className="max-w-7xl mx-auto w-full px-6 pb-2.5 flex items-center justify-between text-[11px] font-mono text-zinc-500 group-hover:text-zinc-200 transition-colors">
+            <span>
+              {lang === 'fr'
+                ? `Suivant : ${sections[activeSection + 1].num} — ${sections[activeSection + 1].label}`
+                : `Next: ${sections[activeSection + 1].num} — ${sections[activeSection + 1].label}`}
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="hidden sm:inline">
+                {lang === 'fr'
+                  ? 'Pointez ici ou défilez pour continuer'
+                  : 'Point here or scroll to advance'}
+              </span>
+              <span className="inline-block transform group-hover:translate-y-0.5 transition-transform">↓</span>
+            </span>
+          </div>
+          {/* Barre de progression au survol */}
+          <div className="w-full h-0.5 bg-zinc-900 overflow-hidden">
+            <div
+              className="h-full bg-cyan-400 transition-none"
+              style={{ width: `${hoverProgress}%` }}
             />
           </div>
         </div>
-
-        {/* BLOC DROITE : Textes, Disponibilité Stage 2027 et Actions */}
-        <div className="flex-grow space-y-6 text-center md:text-left max-w-2xl">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-              <span className="inline-block text-cyan-400 font-semibold tracking-wider text-xs uppercase bg-cyan-950/50 px-3.5 py-1.5 rounded-full border border-cyan-800/40">
-                {lang === 'fr' ? 'BUT 3 Informatique • Parcours RACA' : '3rd-Year B.Sc. in Computer Science'}
-              </span>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-1.5 text-emerald-300 hover:text-emerald-200 font-medium text-xs bg-emerald-950/60 hover:bg-emerald-950 px-3.5 py-1.5 rounded-full border border-emerald-700/40 transition-colors"
-              >
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
-                {lang === 'fr'
-                  ? 'Stage : 1er mars – 4 juin 2027 (Pologne, Portugal, France)'
-                  : 'Internship: March 1 – June 4, 2027 (Poland, Portugal, France • Erasmus+)'}
-              </Link>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent pt-1">
-              Côme Vermeulen
-            </h1>
-            <p className="text-xl md:text-2xl font-medium text-cyan-400">
-              {lang === 'fr'
-                ? 'Développeur Full-Stack, Backend & Architectures Temps Réel'
-                : 'Full-Stack, Backend & Real-Time Systems Developer'}
-            </p>
-          </div>
-
-          {lang === 'fr' ? (
-            <p className="text-slate-300 text-base md:text-lg leading-relaxed">
-              Étudiant en <strong className="text-white font-semibold">3ème année de BUT Informatique</strong> à
-              l&apos;IUT d&apos;Amiens (spécialité Réalisation d&apos;Applications). Je conçois et déploie des
-              applications complètes — architectures{' '}
-              <strong className="text-slate-200">Monorepo TypeScript</strong>, serveurs temps réel{' '}
-              <strong className="text-slate-200">WebSocket / Node.js</strong>, plateformes{' '}
-              <strong className="text-slate-200">SaaS multi-tenant</strong> et environnements conteneurisés sous{' '}
-              <strong className="text-slate-200">Docker</strong> — avec une exigence constante de{' '}
-              <em>clean code</em> et de tests automatisés.
-            </p>
-          ) : (
-            <p className="text-slate-300 text-base md:text-lg leading-relaxed">
-              Final-year <strong className="text-white font-semibold">Computer Science undergraduate (B.Sc.)</strong>{' '}
-              at IUT d&apos;Amiens, France, specializing in Software & Application Development. I design, test, and
-              deploy full-stack applications —{' '}
-              <strong className="text-slate-200">TypeScript Monorepos</strong>, real-time{' '}
-              <strong className="text-slate-200">WebSocket / Node.js</strong> servers,{' '}
-              <strong className="text-slate-200">multi-tenant SaaS</strong> platforms, and{' '}
-              <strong className="text-slate-200">Dockerized</strong> multi-service environments — with a strong focus
-              on <em>clean code</em> and software quality.
-            </p>
-          )}
-
-          {/* Encart synthétique Stage 2027 */}
-          <div className="bg-slate-950/90 border border-slate-800 rounded-xl p-4 text-left space-y-1.5 shadow-lg">
-            <p className="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-2">
-              <span>🌍</span>
-              {lang === 'fr'
-                ? 'Disponibilité Stage de Fin de BUT — Printemps 2027 (13 semaines)'
-                : 'Final-Year Internship Availability — Spring 2027 (13 weeks)'}
-            </p>
-            <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-              {lang === 'fr' ? (
-                <>
-                  Disponible du <strong className="text-white">1er mars au 4 juin 2027</strong> pour un stage en
-                  développement Full-Stack, Backend ou Logiciel. Mobilité internationale prioritaire en{' '}
-                  <strong className="text-cyan-300">Pologne</strong> (Varsovie, Cracovie, Wrocław, Gdańsk) et au{' '}
-                  <strong className="text-cyan-300">Portugal</strong> (Lisbonne, Porto) —{' '}
-                  <span className="text-emerald-400 font-medium">éligible bourse Erasmus+</span> — ainsi qu&apos;en{' '}
-                  <strong className="text-white">France</strong>.
-                </>
-              ) : (
-                <>
-                  Available from <strong className="text-white">March 1 to June 4, 2027</strong> for a Full-Stack,
-                  Backend, or Software Engineering internship. Prioritizing international mobility in{' '}
-                  <strong className="text-cyan-300">Poland</strong> (Warsaw, Kraków, Wrocław, Gdańsk) and{' '}
-                  <strong className="text-cyan-300">Portugal</strong> (Lisbon, Porto) —{' '}
-                  <span className="text-emerald-400 font-medium">Erasmus+ grant eligible (zero visa required)</span> —
-                  as well as opportunities in <strong className="text-white">France</strong>.
-                </>
-              )}
-            </p>
-          </div>
-
-          {/* Boutons d'action */}
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 pt-1">
-            <Link
-              href="/projets"
-              className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-6 py-3 rounded-lg transition-all transform hover:-translate-y-0.5 shadow-lg shadow-cyan-500/20 text-sm"
-            >
-              {lang === 'fr' ? 'Découvrir mes projets (BUT 3 & Stage)' : 'Explore my projects'}
-            </Link>
-            <Link
-              href="/contact"
-              className="bg-slate-950 hover:bg-slate-800 text-slate-200 font-semibold px-6 py-3 rounded-lg border border-slate-800 transition-all text-sm"
-            >
-              {lang === 'fr' ? 'Me contacter / Proposer un stage' : 'Contact me'}
-            </Link>
-            <a
-              href="https://github.com/Meqle"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-slate-950 hover:bg-slate-800 text-slate-300 hover:text-cyan-400 font-medium px-4 py-3 rounded-lg border border-slate-800 transition-all text-sm flex items-center gap-2"
-            >
-              <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-              </svg>
-              GitHub
-            </a>
-          </div>
-
-          {/* Compétences de prédilection */}
-          <div className="pt-6 border-t border-slate-800/60 w-full">
-            <p className="text-xs font-semibold tracking-widest text-slate-500 uppercase mb-3">
-              {lang === 'fr' ? 'Stack Technique Principale' : 'Core Tech Stack'}
-            </p>
-            <div className="flex flex-wrap justify-center md:justify-start gap-2 text-xs text-slate-300">
-              {techBadges.map((tech) => (
-                <span
-                  key={tech}
-                  className="bg-slate-950 px-3 py-1.5 rounded-md border border-slate-800/80 hover:border-cyan-800/60 transition-colors"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+      )}
+    </div>
   );
 }
