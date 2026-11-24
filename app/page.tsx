@@ -45,7 +45,6 @@ export default function PortfolioDeck() {
     }
   }, []);
 
-  // Mouse spotlight tracking
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setMousePos({ x: e.clientX, y: e.clientY });
@@ -54,7 +53,6 @@ export default function PortfolioDeck() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // IntersectionObserver to sync activeSection on scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -77,7 +75,6 @@ export default function PortfolioDeck() {
     return () => observer.disconnect();
   }, []);
 
-  // Keyboard navigation (ArrowDown / ArrowUp / PageDown / PageUp)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
@@ -99,11 +96,10 @@ export default function PortfolioDeck() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [activeSection, scrollToSection]);
 
-  // Bottom hover zone auto-advance ("pointer la souris vers le bas pour passer à l'écran suivant")
   const handleBottomZoneEnter = () => {
     if (activeSection >= 4) return;
     const startTime = performance.now();
-    const duration = 550; // ms before gliding to next section
+    const duration = 550;
 
     const tick = (now: number) => {
       const elapsed = now - startTime;
@@ -457,19 +453,22 @@ export default function PortfolioDeck() {
   const currentProject = projects[activeProject];
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-zinc-100">
-      {/* Halo subtil qui suit le curseur */}
+    <div className="relative min-h-screen bg-[#0b1120] text-slate-100">
+      {/* Dégradé atmosphérique bleu nuit ardoise en fond */}
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_rgba(30,58,138,0.22),_transparent_55%)]" />
+
+      {/* Halo discret qui suit le curseur */}
       <div
         className="pointer-events-none fixed inset-0 z-10 transition-opacity duration-300"
         style={{
-          background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(34, 211, 238, 0.045), transparent 45%)`,
+          background: `radial-gradient(650px circle at ${mousePos.x}px ${mousePos.y}px, rgba(56, 189, 248, 0.06), transparent 45%)`,
         }}
       />
 
       {/* Barre supérieure minimaliste */}
       <Navbar activeSection={activeSection} onSelectSection={scrollToSection} sections={sections} />
 
-      {/* Rail vertical de navigation à droite (Desktop) */}
+      {/* Rail vertical de navigation à droite */}
       <aside className="hidden xl:flex fixed right-6 top-1/2 -translate-y-1/2 z-40 flex-col items-end gap-3">
         {sections.map((sec, idx) => {
           const isActive = activeSection === idx;
@@ -484,8 +483,8 @@ export default function PortfolioDeck() {
               <span
                 className={`text-[11px] font-mono transition-all duration-200 ${
                   isActive
-                    ? 'opacity-100 text-zinc-200 translate-x-0'
-                    : 'opacity-0 group-hover:opacity-100 text-zinc-500 translate-x-2 group-hover:translate-x-0'
+                    ? 'opacity-100 text-slate-200 translate-x-0'
+                    : 'opacity-0 group-hover:opacity-100 text-slate-400 translate-x-2 group-hover:translate-x-0'
                 }`}
               >
                 {sec.num} · {sec.label}
@@ -493,8 +492,8 @@ export default function PortfolioDeck() {
               <span
                 className={`block transition-all duration-300 rounded-full ${
                   isActive
-                    ? 'w-2 h-6 bg-cyan-400'
-                    : 'w-1.5 h-1.5 bg-zinc-700 group-hover:bg-zinc-400'
+                    ? 'w-2 h-6 bg-sky-400 shadow-[0_0_10px_rgba(56,189,248,0.5)]'
+                    : 'w-1.5 h-1.5 bg-slate-700 group-hover:bg-slate-400'
                 }`}
               />
             </button>
@@ -511,17 +510,17 @@ export default function PortfolioDeck() {
         ref={(el) => {
           sectionRefs.current[0] = el;
         }}
-        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-20 pb-24 border-b border-zinc-900"
+        className="relative z-20 min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 pt-20 pb-24 border-b border-slate-800/70"
       >
         <div className="max-w-6xl mx-auto w-full grid lg:grid-cols-12 gap-12 items-center">
-          {/* Colonne Texte (8 colonnes) */}
+          {/* Colonne Texte */}
           <div className="lg:col-span-8 space-y-8">
-            <div className="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-slate-700/80 text-xs text-slate-200 shadow-sm">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="font-mono text-[11px] text-emerald-400 uppercase tracking-wider">
                 {lang === 'fr' ? 'Stage 2027' : '2027 Internship'}
               </span>
-              <span className="text-zinc-700">|</span>
+              <span className="text-slate-700">|</span>
               <span>
                 {lang === 'fr'
                   ? 'Disponible du 1er mars au 4 juin 2027 · Pologne, Portugal (Erasmus+) & France'
@@ -530,22 +529,22 @@ export default function PortfolioDeck() {
             </div>
 
             <div className="space-y-4">
-              <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+              <p className="font-mono text-xs uppercase tracking-widest text-sky-400/90">
                 {lang === 'fr'
                   ? '01 / Introduction — BUT 3 Informatique · IUT d’Amiens'
                   : '01 / Overview — 3rd-Year B.Sc. in Computer Science · France'}
               </p>
-              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-zinc-100 leading-[1.08]">
+              <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-[1.08]">
                 Côme Vermeulen
               </h1>
-              <p className="text-xl sm:text-2xl text-zinc-400 font-normal max-w-2xl leading-snug">
+              <p className="text-xl sm:text-2xl text-slate-300 font-normal max-w-2xl leading-snug">
                 {lang === 'fr'
                   ? 'Développeur Full-Stack & Logiciel, spécialisé dans les architectures TypeScript, les systèmes temps réel et la conteneurisation Docker.'
                   : 'Full-Stack & Software Developer specializing in TypeScript architectures, real-time networked systems, and Dockerized environments.'}
               </p>
             </div>
 
-            <p className="text-zinc-400 text-sm sm:text-base leading-relaxed max-w-2xl">
+            <p className="text-slate-400 text-sm sm:text-base leading-relaxed max-w-2xl">
               {lang === 'fr'
                 ? "Étudiant en troisième année de BUT Informatique (parcours Réalisation d'Applications), je conçois des applications web et logicielles structurées : monorepos TypeScript, serveurs WebSocket autoritaires, plateformes SaaS multi-entreprises et déploiements reproductibles sous Docker."
                 : 'Final-year Computer Science undergraduate focusing on Application Development. I build structured web and desktop software: TypeScript monorepos, authoritative WebSocket servers, multi-tenant SaaS platforms, and reproducible multi-container Docker deployments.'}
@@ -556,14 +555,14 @@ export default function PortfolioDeck() {
               <button
                 type="button"
                 onClick={() => scrollToSection(1)}
-                className="bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs sm:text-sm px-5 py-3 rounded-md transition-colors"
+                className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm px-5 py-3 rounded-md transition-colors shadow-lg shadow-sky-500/15"
               >
                 {lang === 'fr' ? 'Explorer mes réalisations' : 'Explore selected work'}
               </button>
               <button
                 type="button"
                 onClick={() => scrollToSection(4)}
-                className="bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-medium text-xs sm:text-sm px-5 py-3 rounded-md border border-zinc-800 transition-colors"
+                className="bg-slate-900/90 hover:bg-slate-800 text-slate-100 font-medium text-xs sm:text-sm px-5 py-3 rounded-md border border-slate-700/80 transition-colors"
               >
                 {lang === 'fr' ? 'Me contacter pour un stage' : 'Contact for internship'}
               </button>
@@ -571,61 +570,61 @@ export default function PortfolioDeck() {
                 href="https://github.com/Meqle"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-mono text-xs text-zinc-400 hover:text-zinc-200 px-3 py-3 transition-colors"
+                className="font-mono text-xs text-slate-400 hover:text-sky-400 px-3 py-3 transition-colors"
               >
                 github.com/Meqle ↗
               </a>
             </div>
 
-            {/* Métriques / Repères sobres */}
-            <div className="pt-8 border-t border-zinc-900 grid grid-cols-2 sm:grid-cols-4 gap-6">
+            {/* Repères synthétiques */}
+            <div className="pt-8 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-6">
               <div>
-                <div className="font-mono text-xs text-zinc-500">
+                <div className="font-mono text-xs text-slate-400">
                   {lang === 'fr' ? 'Formation' : 'Degree'}
                 </div>
-                <div className="text-sm font-medium text-zinc-200 mt-1">
+                <div className="text-sm font-medium text-slate-100 mt-1">
                   {lang === 'fr' ? 'BUT 3 Informatique' : 'B.Sc. Computer Science'}
                 </div>
               </div>
               <div>
-                <div className="font-mono text-xs text-zinc-500">
+                <div className="font-mono text-xs text-slate-400">
                   {lang === 'fr' ? 'Dominante' : 'Focus'}
                 </div>
-                <div className="text-sm font-medium text-zinc-200 mt-1">Full-Stack & Temps Réel</div>
+                <div className="text-sm font-medium text-slate-100 mt-1">Full-Stack & Temps Réel</div>
               </div>
               <div>
-                <div className="font-mono text-xs text-zinc-500">
+                <div className="font-mono text-xs text-slate-400">
                   {lang === 'fr' ? 'Mobilité 2027' : '2027 Mobility'}
                 </div>
-                <div className="text-sm font-medium text-zinc-200 mt-1">
+                <div className="text-sm font-medium text-slate-100 mt-1">
                   {lang === 'fr' ? 'Pologne · Portugal · France' : 'Poland · Portugal · France'}
                 </div>
               </div>
               <div>
-                <div className="font-mono text-xs text-zinc-500">
+                <div className="font-mono text-xs text-slate-400">
                   {lang === 'fr' ? 'Durée de stage' : 'Internship Window'}
                 </div>
-                <div className="text-sm font-medium text-zinc-200 mt-1">
+                <div className="text-sm font-medium text-slate-100 mt-1">
                   {lang === 'fr' ? '13 semaines (Mars – Juin)' : '13 weeks (Mar – Jun)'}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Colonne Portrait sobre (4 colonnes) */}
+          {/* Colonne Portrait */}
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="relative w-56 h-64 sm:w-64 sm:h-72 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900 shadow-2xl">
+            <div className="relative w-56 h-64 sm:w-64 sm:h-72 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-900 shadow-2xl shadow-slate-950/60">
               <Image
                 src="/come-photo.jpg"
                 alt="Côme Vermeulen"
                 fill
                 sizes="(max-width: 768px) 224px, 256px"
                 priority
-                className="object-cover grayscale-[15%] hover:grayscale-0 transition-all duration-500"
+                className="object-cover transition-transform duration-500 hover:scale-105"
               />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/40 to-transparent p-4">
-                <p className="font-mono text-[11px] text-zinc-300">Côme Vermeulen</p>
-                <p className="font-mono text-[10px] text-zinc-500">Amiens, France</p>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0b1120]/95 via-[#0b1120]/45 to-transparent p-4">
+                <p className="font-mono text-[11px] text-slate-100">Côme Vermeulen</p>
+                <p className="font-mono text-[10px] text-slate-400">Amiens, France</p>
               </div>
             </div>
           </div>
@@ -641,19 +640,19 @@ export default function PortfolioDeck() {
         ref={(el) => {
           sectionRefs.current[1] = el;
         }}
-        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-zinc-900"
+        className="relative z-20 min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-slate-800/70"
       >
         <div className="max-w-6xl mx-auto w-full space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-zinc-900 pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800/80 pb-5">
             <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+              <p className="font-mono text-xs uppercase tracking-widest text-sky-400/90">
                 {lang === 'fr' ? '02 / Réalisations sélectionnées' : '02 / Selected Work'}
               </p>
-              <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">
                 {lang === 'fr' ? 'Projets & Architectures' : 'Projects & System Architectures'}
               </h2>
             </div>
-            <p className="text-xs font-mono text-zinc-500">
+            <p className="text-xs font-mono text-slate-400">
               {lang === 'fr'
                 ? 'Survolez ou cliquez sur un projet pour inspecter son architecture'
                 : 'Hover or click a project to inspect its architecture'}
@@ -661,8 +660,8 @@ export default function PortfolioDeck() {
           </div>
 
           <div className="grid lg:grid-cols-12 gap-8 items-start">
-            {/* Liste des 4 projets à gauche (4 colonnes) */}
-            <div className="lg:col-span-4 flex flex-col gap-2">
+            {/* Liste des 4 projets à gauche */}
+            <div className="lg:col-span-4 flex flex-col gap-2.5">
               {projects.map((proj, idx) => {
                 const isSelected = activeProject === idx;
                 return (
@@ -673,43 +672,42 @@ export default function PortfolioDeck() {
                     onClick={() => setActiveProject(idx)}
                     className={`w-full text-left p-4 rounded-lg border transition-all duration-200 ${
                       isSelected
-                        ? 'bg-zinc-900/90 border-zinc-700 shadow-lg'
-                        : 'bg-zinc-950 border-zinc-900 hover:border-zinc-800 hover:bg-zinc-900/30'
+                        ? 'bg-slate-800/75 border-sky-500/50 shadow-lg shadow-slate-950/50'
+                        : 'bg-slate-900/40 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900/80'
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs font-mono">
-                      <span className={isSelected ? 'text-cyan-400 font-semibold' : 'text-zinc-600'}>
+                      <span className={isSelected ? 'text-sky-400 font-semibold' : 'text-slate-500'}>
                         {proj.num}
                       </span>
-                      <span className="text-zinc-500">{proj.context}</span>
+                      <span className="text-slate-400">{proj.context}</span>
                     </div>
                     <h3
                       className={`text-base font-semibold mt-1.5 transition-colors ${
-                        isSelected ? 'text-zinc-100' : 'text-zinc-400'
+                        isSelected ? 'text-white' : 'text-slate-300'
                       }`}
                     >
                       {proj.title}
                     </h3>
-                    <p className="text-xs text-zinc-500 mt-1 line-clamp-1">{proj.subtitle}</p>
+                    <p className="text-xs text-slate-400 mt-1 line-clamp-1">{proj.subtitle}</p>
                   </button>
                 );
               })}
             </div>
 
-            {/* Panneau de détail interactif à droite (8 colonnes) */}
-            <div className="lg:col-span-8 bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 sm:p-8 space-y-6">
-              {/* En-tête du projet sélectionné */}
-              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-zinc-800/80 pb-5">
+            {/* Panneau de détail interactif à droite */}
+            <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 sm:p-8 space-y-6 shadow-xl shadow-slate-950/40">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-slate-800/80 pb-5">
                 <div>
-                  <div className="flex items-center gap-2 font-mono text-xs text-cyan-400">
+                  <div className="flex items-center gap-2 font-mono text-xs text-sky-400">
                     <span>{currentProject.num}</span>
                     <span>/</span>
                     <span>{currentProject.context}</span>
                     <span>·</span>
                     <span>{currentProject.year}</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-zinc-100 mt-1">{currentProject.title}</h3>
-                  <p className="text-sm text-zinc-400 mt-0.5">{currentProject.subtitle}</p>
+                  <h3 className="text-2xl font-bold text-white mt-1">{currentProject.title}</h3>
+                  <p className="text-sm text-slate-400 mt-0.5">{currentProject.subtitle}</p>
                 </div>
 
                 {currentProject.repo && (
@@ -717,7 +715,7 @@ export default function PortfolioDeck() {
                     href={currentProject.repo}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 inline-flex items-center gap-2 bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs px-4 py-2.5 rounded-md transition-colors"
+                    className="shrink-0 inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs px-4 py-2.5 rounded-md transition-colors"
                   >
                     <span>{lang === 'fr' ? 'Dépôt GitHub' : 'GitHub Repository'}</span>
                     <span>↗</span>
@@ -725,40 +723,36 @@ export default function PortfolioDeck() {
                 )}
               </div>
 
-              {/* Stack technique sobre */}
               <div className="flex flex-wrap gap-1.5">
                 {currentProject.stack.map((tech) => (
                   <span
                     key={tech}
-                    className="font-mono text-[11px] bg-zinc-950 text-zinc-300 px-2.5 py-1 rounded border border-zinc-800"
+                    className="font-mono text-[11px] bg-slate-950/80 text-slate-200 px-2.5 py-1 rounded border border-slate-800"
                   >
                     {tech}
                   </span>
                 ))}
               </div>
 
-              {/* Résumé */}
-              <p className="text-sm text-zinc-300 leading-relaxed">{currentProject.summary}</p>
+              <p className="text-sm text-slate-300 leading-relaxed">{currentProject.summary}</p>
 
-              {/* 3 Points d'ingénierie */}
               <div className="grid sm:grid-cols-3 gap-4">
                 {currentProject.points.map((pt) => (
-                  <div key={pt.label} className="bg-zinc-950/80 border border-zinc-800/80 rounded-lg p-4 space-y-1.5">
-                    <h4 className="text-xs font-semibold text-zinc-200">{pt.label}</h4>
-                    <p className="text-xs text-zinc-400 leading-relaxed">{pt.text}</p>
+                  <div key={pt.label} className="bg-slate-950/60 border border-slate-800/80 rounded-lg p-4 space-y-1.5">
+                    <h4 className="text-xs font-semibold text-slate-100">{pt.label}</h4>
+                    <p className="text-xs text-slate-400 leading-relaxed">{pt.text}</p>
                   </div>
                 ))}
               </div>
 
-              {/* Module visuel : Schéma d'architecture (Projets 01-03) ou Visionneuse de captures (Projet 04) */}
               {currentProject.archNodes.length > 0 ? (
-                <div className="bg-zinc-950 border border-zinc-800/90 rounded-lg p-4 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
                       {lang === 'fr' ? 'Topologie & Flux Applicatif' : 'System Topology & Data Flow'}
                     </span>
                     {currentProject.command && (
-                      <code className="font-mono text-[11px] text-cyan-400 bg-zinc-900 px-2.5 py-0.5 rounded border border-zinc-800">
+                      <code className="font-mono text-[11px] text-sky-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800">
                         $ {currentProject.command}
                       </code>
                     )}
@@ -768,25 +762,24 @@ export default function PortfolioDeck() {
                     {currentProject.archNodes.map((node, i) => (
                       <div
                         key={node.title}
-                        className="relative bg-zinc-900/70 border border-zinc-800 rounded-md p-3 flex flex-col justify-between"
+                        className="relative bg-slate-900/90 border border-slate-800 rounded-md p-3 flex flex-col justify-between"
                       >
-                        <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 mb-1">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
                           <span>0{i + 1}</span>
                           {i < currentProject.archNodes.length - 1 && (
-                            <span className="hidden sm:inline text-zinc-600">→</span>
+                            <span className="hidden sm:inline text-sky-500/70">→</span>
                           )}
                         </div>
-                        <div className="text-xs font-semibold text-zinc-200">{node.title}</div>
-                        <div className="text-[11px] font-mono text-zinc-400 mt-1">{node.detail}</div>
+                        <div className="text-xs font-semibold text-slate-100">{node.title}</div>
+                        <div className="text-[11px] font-mono text-slate-400 mt-1">{node.detail}</div>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="bg-zinc-950 border border-zinc-800/90 rounded-lg p-4 space-y-4">
-                  {/* Sélecteur d'aperçus Pink Studio */}
+                <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-500">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
                       {lang === 'fr' ? 'Captures du projet' : 'Project Screenshots'}
                     </span>
                     <div className="flex flex-wrap gap-1">
@@ -797,8 +790,8 @@ export default function PortfolioDeck() {
                           onClick={() => setActivePinkTab(sIdx)}
                           className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
                             activePinkTab === sIdx
-                              ? 'bg-zinc-100 text-zinc-950 font-semibold'
-                              : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+                              ? 'bg-sky-500 text-slate-950 font-semibold'
+                              : 'bg-slate-900 text-slate-400 hover:text-slate-200'
                           }`}
                         >
                           {shot.label}
@@ -807,7 +800,7 @@ export default function PortfolioDeck() {
                     </div>
                   </div>
 
-                  <div className="relative h-56 sm:h-64 w-full rounded border border-zinc-800 bg-zinc-900 overflow-hidden">
+                  <div className="relative h-56 sm:h-64 w-full rounded border border-slate-800 bg-slate-900 overflow-hidden">
                     <Image
                       src={pinkScreenshots[activePinkTab].src}
                       alt={pinkScreenshots[activePinkTab].label}
@@ -816,7 +809,7 @@ export default function PortfolioDeck() {
                       className="object-contain p-2"
                     />
                   </div>
-                  <p className="text-xs text-zinc-400 font-mono">{pinkScreenshots[activePinkTab].caption}</p>
+                  <p className="text-xs text-slate-400 font-mono">{pinkScreenshots[activePinkTab].caption}</p>
                 </div>
               )}
             </div>
@@ -833,167 +826,162 @@ export default function PortfolioDeck() {
         ref={(el) => {
           sectionRefs.current[2] = el;
         }}
-        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-zinc-900"
+        className="relative z-20 min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-slate-800/70"
       >
         <div className="max-w-6xl mx-auto w-full space-y-10">
-          <div className="border-b border-zinc-900 pb-5">
-            <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+          <div className="border-b border-slate-800/80 pb-5">
+            <p className="font-mono text-xs uppercase tracking-widest text-sky-400/90">
               {lang === 'fr' ? '03 / Compétences Techniques' : '03 / Technical Capabilities'}
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">
               {lang === 'fr' ? 'Stack Technique & Pratiques d’Ingénierie' : 'Tech Stack & Engineering Practices'}
             </h2>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {/* Pôle 1 */}
-            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
-              <div className="font-mono text-xs text-cyan-400">01 / FRONTEND & CLIENTS</div>
-              <h3 className="text-base font-semibold text-zinc-100">
+            <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
+              <div className="font-mono text-xs text-sky-400">01 / FRONTEND & CLIENTS</div>
+              <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Interfaces Web & Desktop' : 'Web & Desktop Interfaces'}
               </h3>
-              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+              <ul className="space-y-2.5 text-xs text-slate-300 font-mono">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>TypeScript / ES2024</span>
-                  <span className="text-zinc-500">{lang === 'fr' ? 'Principal' : 'Primary'}</span>
+                  <span className="text-slate-400">{lang === 'fr' ? 'Principal' : 'Primary'}</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>React / Next.js</span>
-                  <span className="text-zinc-500">App Router</span>
+                  <span className="text-slate-400">App Router</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Vue 3</span>
-                  <span className="text-zinc-500">Vite · SPA</span>
+                  <span className="text-slate-400">Vite · SPA</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Electron</span>
-                  <span className="text-zinc-500">Desktop</span>
+                  <span className="text-slate-400">Desktop</span>
                 </li>
                 <li className="flex justify-between">
                   <span>PixiJS · Tailwind CSS</span>
-                  <span className="text-zinc-500">2D · UI</span>
+                  <span className="text-slate-400">2D · UI</span>
                 </li>
               </ul>
             </div>
 
-            {/* Pôle 2 */}
-            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
-              <div className="font-mono text-xs text-cyan-400">02 / BACKEND & RÉSEAU</div>
-              <h3 className="text-base font-semibold text-zinc-100">
+            <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
+              <div className="font-mono text-xs text-sky-400">02 / BACKEND & RÉSEAU</div>
+              <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Serveurs, API & Temps Réel' : 'Servers, APIs & Real-Time'}
               </h3>
-              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+              <ul className="space-y-2.5 text-xs text-slate-300 font-mono">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Node.js / Express 5</span>
-                  <span className="text-zinc-500">REST API</span>
+                  <span className="text-slate-400">REST API</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>WebSocket / Socket.io</span>
-                  <span className="text-zinc-500">{lang === 'fr' ? 'Temps réel' : 'Real-Time'}</span>
+                  <span className="text-slate-400">{lang === 'fr' ? 'Temps réel' : 'Real-Time'}</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Python</span>
-                  <span className="text-zinc-500">Algo · Scripts</span>
+                  <span className="text-slate-400">Algo · Scripts</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>C# / .NET · Java</span>
-                  <span className="text-zinc-500">OOP</span>
+                  <span className="text-slate-400">OOP</span>
                 </li>
                 <li className="flex justify-between">
                   <span>PHP · C / C++</span>
-                  <span className="text-zinc-500">Backend · Sys</span>
+                  <span className="text-slate-400">Backend · Sys</span>
                 </li>
               </ul>
             </div>
 
-            {/* Pôle 3 */}
-            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
-              <div className="font-mono text-xs text-cyan-400">03 / DONNÉES</div>
-              <h3 className="text-base font-semibold text-zinc-100">
+            <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
+              <div className="font-mono text-xs text-sky-400">03 / DONNÉES</div>
+              <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Bases SQL & NoSQL' : 'SQL & NoSQL Databases'}
               </h3>
-              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+              <ul className="space-y-2.5 text-xs text-slate-300 font-mono">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>PostgreSQL</span>
-                  <span className="text-zinc-500">PL/pgSQL</span>
+                  <span className="text-slate-400">PL/pgSQL</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>MongoDB 8</span>
-                  <span className="text-zinc-500">Mongoose</span>
+                  <span className="text-slate-400">Mongoose</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>MySQL / MariaDB</span>
-                  <span className="text-zinc-500">Relationnel</span>
+                  <span className="text-slate-400">Relationnel</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Isolation Multi-Tenant</span>
-                  <span className="text-zinc-500">SaaS</span>
+                  <span className="text-slate-400">SaaS</span>
                 </li>
                 <li className="flex justify-between">
                   <span>JWT & Rôles RBAC</span>
-                  <span className="text-zinc-500">Sécurité</span>
+                  <span className="text-slate-400">Sécurité</span>
                 </li>
               </ul>
             </div>
 
-            {/* Pôle 4 */}
-            <div className="bg-zinc-900/40 border border-zinc-800/90 rounded-xl p-6 space-y-4">
-              <div className="font-mono text-xs text-cyan-400">04 / DEVOPS & QUALITÉ</div>
-              <h3 className="text-base font-semibold text-zinc-100">
+            <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
+              <div className="font-mono text-xs text-sky-400">04 / DEVOPS & QUALITÉ</div>
+              <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Industrialisation & Tests' : 'Containers & Testing'}
               </h3>
-              <ul className="space-y-2.5 text-xs text-zinc-300 font-mono">
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+              <ul className="space-y-2.5 text-xs text-slate-300 font-mono">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Docker & Compose</span>
-                  <span className="text-zinc-500">Multi-Stage</span>
+                  <span className="text-slate-400">Multi-Stage</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Monorepo Workspaces</span>
-                  <span className="text-zinc-500">Shared Types</span>
+                  <span className="text-slate-400">Shared Types</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Tests Automatisés</span>
-                  <span className="text-zinc-500">TDD · BDD</span>
+                  <span className="text-slate-400">TDD · BDD</span>
                 </li>
-                <li className="flex justify-between border-b border-zinc-800/60 pb-1.5">
+                <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>Nginx</span>
-                  <span className="text-zinc-500">Reverse Proxy</span>
+                  <span className="text-slate-400">Reverse Proxy</span>
                 </li>
                 <li className="flex justify-between">
                   <span>Git / GitHub · Linux</span>
-                  <span className="text-zinc-500">Git Flow</span>
+                  <span className="text-slate-400">Git Flow</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          {/* Synthèse méthodologique sobre */}
           <div className="grid md:grid-cols-3 gap-5 pt-2">
-            <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-5 space-y-2">
-              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            <div className="bg-slate-900/35 border border-slate-800/80 rounded-lg p-5 space-y-2">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-sky-400/90">
                 {lang === 'fr' ? 'Environnements Reproductibles' : 'Reproducible Environments'}
               </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-slate-300 leading-relaxed">
                 {lang === 'fr'
                   ? 'Chaque projet récent est configuré pour démarrer en une seule commande Docker Compose, avec vérification de disponibilité des bases de données et isolation réseau des services.'
                   : 'Every recent project is configured to spin up with a single Docker Compose command, complete with database healthchecks and internal service network isolation.'}
               </p>
             </div>
-            <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-5 space-y-2">
-              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            <div className="bg-slate-900/35 border border-slate-800/80 rounded-lg p-5 space-y-2">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-sky-400/90">
                 {lang === 'fr' ? 'Contrats de Typage Stricts' : 'Strict Type Contracts'}
               </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-slate-300 leading-relaxed">
                 {lang === 'fr'
                   ? 'Utilisation d’architectures Monorepo permettant de partager les schémas de données et protocoles WebSocket entre le client et le serveur sans duplication.'
                   : 'Monorepo workspace structures sharing data schemas and WebSocket protocols directly between client and server packages without duplication.'}
               </p>
             </div>
-            <div className="bg-zinc-950 border border-zinc-900 rounded-lg p-5 space-y-2">
-              <h4 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            <div className="bg-slate-900/35 border border-slate-800/80 rounded-lg p-5 space-y-2">
+              <h4 className="text-xs font-mono uppercase tracking-wider text-sky-400/90">
                 {lang === 'fr' ? 'Algorithmique & Modélisation' : 'Algorithms & Modeling'}
               </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
+              <p className="text-xs text-slate-300 leading-relaxed">
                 {lang === 'fr'
                   ? 'Solide bagage en algorithmique et modélisation mathématique en Python : méthodes d’optimisation, cryptanalyse par chaînes de Markov (MCMC) et traitement du signal et de l’image.'
                   : 'Strong foundation in Python algorithmic modeling: optimization methods, Markov Chain Monte Carlo cryptanalysis, and digital image processing.'}
@@ -1012,40 +1000,39 @@ export default function PortfolioDeck() {
         ref={(el) => {
           sectionRefs.current[3] = el;
         }}
-        className="relative min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-zinc-900"
+        className="relative z-20 min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-20 border-b border-slate-800/70"
       >
         <div className="max-w-6xl mx-auto w-full space-y-10">
-          <div className="border-b border-zinc-900 pb-5">
-            <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+          <div className="border-b border-slate-800/80 pb-5">
+            <p className="font-mono text-xs uppercase tracking-widest text-sky-400/90">
               {lang === 'fr' ? '04 / Parcours & Évolution' : '04 / Background & Progression'}
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">
               {lang === 'fr' ? 'Formation & Expériences' : 'Education & Experience'}
             </h2>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-10">
-            {/* Colonne Formation */}
             <div className="space-y-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400">
                 {lang === 'fr' ? 'Cursus Universitaire' : 'Academic Background'}
               </h3>
 
-              <div className="space-y-6 border-l border-zinc-800 pl-6">
+              <div className="space-y-6 border-l border-slate-800 pl-6">
                 <div className="relative space-y-1.5">
-                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-cyan-400" />
-                  <div className="font-mono text-xs text-cyan-400">2024 – 2027</div>
-                  <h4 className="text-base font-semibold text-zinc-100">
+                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.6)]" />
+                  <div className="font-mono text-xs text-sky-400">2024 – 2027</div>
+                  <h4 className="text-base font-semibold text-white">
                     {lang === 'fr'
                       ? 'BUT Informatique — Parcours Réalisation d’Applications'
                       : 'B.Sc. in Computer Science (BUT Informatique)'}
                   </h4>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-slate-300">
                     {lang === 'fr'
                       ? 'IUT d’Amiens, Université de Picardie Jules Verne — Actuellement en 3ème année'
                       : 'IUT d’Amiens, France — Currently in 3rd and final year'}
                   </p>
-                  <p className="text-xs text-zinc-400 leading-relaxed pt-1">
+                  <p className="text-xs text-slate-400 leading-relaxed pt-1">
                     {lang === 'fr'
                       ? 'Conception logicielle, architectures distribuées, virtualisation et conteneurisation Docker, bases de données relationnelles et NoSQL, qualité de développement et tests automatisés.'
                       : 'Software architecture, distributed systems, Docker containerization, relational and NoSQL databases, software quality engineering, and automated testing.'}
@@ -1053,19 +1040,19 @@ export default function PortfolioDeck() {
                 </div>
 
                 <div className="relative space-y-1.5">
-                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-zinc-700" />
-                  <div className="font-mono text-xs text-zinc-500">2023 – 2024</div>
-                  <h4 className="text-base font-semibold text-zinc-200">
+                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-slate-600" />
+                  <div className="font-mono text-xs text-slate-400">2023 – 2024</div>
+                  <h4 className="text-base font-semibold text-slate-200">
                     {lang === 'fr'
                       ? 'Classe Préparatoire Intégrée — EPITA'
                       : 'Integrated Engineering Preparatory Class — EPITA'}
                   </h4>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-slate-400">
                     {lang === 'fr'
                       ? 'École d’Ingénieurs en Informatique — Semestre intensif'
                       : 'Graduate School of Computer Science — Intensive semester'}
                   </p>
-                  <p className="text-xs text-zinc-400 leading-relaxed pt-1">
+                  <p className="text-xs text-slate-400 leading-relaxed pt-1">
                     {lang === 'fr'
                       ? 'Acquisition d’une forte rigueur mathématique et algorithmique, programmation fonctionnelle en OCaml et bases de l’architecture système.'
                       : 'Strong mathematical and algorithmic rigor, functional programming in OCaml, and systems fundamentals.'}
@@ -1073,12 +1060,12 @@ export default function PortfolioDeck() {
                 </div>
 
                 <div className="relative space-y-1.5">
-                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-zinc-700" />
-                  <div className="font-mono text-xs text-zinc-500">2023</div>
-                  <h4 className="text-base font-semibold text-zinc-200">
+                  <span className="absolute -left-[29px] top-1.5 h-2.5 w-2.5 rounded-full bg-slate-600" />
+                  <div className="font-mono text-xs text-slate-400">2023</div>
+                  <h4 className="text-base font-semibold text-slate-200">
                     {lang === 'fr' ? 'Baccalauréat Général' : 'French High School Diploma'}
                   </h4>
-                  <p className="text-xs text-zinc-400">
+                  <p className="text-xs text-slate-400">
                     {lang === 'fr'
                       ? 'Spécialités Mathématiques et Numérique & Sciences Informatiques'
                       : 'Specializations in Mathematics and Computer Science'}
@@ -1087,70 +1074,68 @@ export default function PortfolioDeck() {
               </div>
             </div>
 
-            {/* Colonne Expériences & Progression */}
             <div className="space-y-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-zinc-400">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400">
                 {lang === 'fr' ? 'Expériences en Entreprise' : 'Professional Experience'}
               </h3>
 
               <div className="space-y-4">
-                <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-5 space-y-2">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-2 shadow-md">
                   <div className="flex items-center justify-between font-mono text-xs">
-                    <span className="text-cyan-400">
+                    <span className="text-sky-400">
                       {lang === 'fr' ? 'Janvier – Mars 2026 · 8 semaines' : 'Jan – Mar 2026 · 8 weeks'}
                     </span>
-                    <span className="text-zinc-500">Amiens, France</span>
+                    <span className="text-slate-400">Amiens, France</span>
                   </div>
-                  <h4 className="text-base font-semibold text-zinc-100">
+                  <h4 className="text-base font-semibold text-white">
                     {lang === 'fr'
                       ? 'Développeur Web Full-Stack Stagiaire — Pink Studio'
                       : 'Full-Stack Web Developer Intern — Pink Studio'}
                   </h4>
-                  <p className="text-xs text-zinc-400 leading-relaxed">
+                  <p className="text-xs text-slate-300 leading-relaxed">
                     {lang === 'fr'
                       ? "Conception et livraison en autonomie complète de la plateforme web de l'entreprise : recueil des besoins auprès du dirigeant, modélisation de la base de données MySQL, développement du back-office d'administration sécurisé et de la galerie publique."
                       : 'Designed and delivered the company web platform as sole developer: requirements gathering with the business owner, MySQL database design, secure CRUD administration back-office, and dynamic public gallery.'}
                   </p>
                 </div>
 
-                <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-5 space-y-2">
-                  <div className="flex items-center justify-between font-mono text-xs text-zinc-500">
+                <div className="bg-slate-900/35 border border-slate-800/80 rounded-xl p-5 space-y-2">
+                  <div className="flex items-center justify-between font-mono text-xs text-slate-400">
                     <span>2024 & 2026</span>
                     <span>France</span>
                   </div>
-                  <h4 className="text-sm font-semibold text-zinc-300">
+                  <h4 className="text-sm font-semibold text-slate-200">
                     {lang === 'fr'
                       ? 'Expériences Saisonnières — Intermarché & McDonald’s'
                       : 'Seasonal Employment — Intermarché & McDonald’s'}
                   </h4>
-                  <p className="text-xs text-zinc-400 leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed">
                     {lang === 'fr'
                       ? 'Travail en équipe sous cadence soutenue, rigueur d’organisation et autonomie opérationnelle.'
                       : 'Fast-paced teamwork, operational rigor, and reliability in high-demand environments.'}
                   </p>
                 </div>
 
-                {/* Progression 3 ans */}
-                <div className="bg-zinc-900/20 border border-zinc-800/70 rounded-xl p-5 space-y-3">
-                  <div className="font-mono text-xs text-zinc-400 uppercase tracking-wider">
+                <div className="bg-slate-900/40 border border-slate-800/90 rounded-xl p-5 space-y-3">
+                  <div className="font-mono text-xs text-slate-400 uppercase tracking-wider">
                     {lang === 'fr' ? 'Progression sur les 3 années du BUT' : '3-Year Engineering Progression'}
                   </div>
                   <div className="grid grid-cols-3 gap-3 text-xs">
                     <div className="space-y-1">
-                      <div className="font-mono text-zinc-500">01 · BUT 1</div>
-                      <div className="font-medium text-zinc-300">
+                      <div className="font-mono text-slate-400">01 · BUT 1</div>
+                      <div className="font-medium text-slate-300">
                         {lang === 'fr' ? 'Fondations algorithmiques & SQL' : 'Core algorithms & SQL'}
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="font-mono text-zinc-500">02 · BUT 2</div>
-                      <div className="font-medium text-zinc-300">
+                      <div className="font-mono text-slate-400">02 · BUT 2</div>
+                      <div className="font-medium text-slate-300">
                         {lang === 'fr' ? 'Autonomie complète en stage' : 'Full-stack autonomy'}
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <div className="font-mono text-cyan-400">03 · BUT 3</div>
-                      <div className="font-medium text-zinc-100">
+                      <div className="font-mono text-sky-400">03 · BUT 3</div>
+                      <div className="font-medium text-white">
                         {lang === 'fr' ? 'Systèmes distribués, Docker & Tests' : 'Distributed systems & Docker'}
                       </div>
                     </div>
@@ -1171,22 +1156,21 @@ export default function PortfolioDeck() {
         ref={(el) => {
           sectionRefs.current[4] = el;
         }}
-        className="relative min-h-screen flex flex-col justify-between px-6 sm:px-12 lg:px-24 pt-20 pb-12"
+        className="relative z-20 min-h-screen flex flex-col justify-between px-6 sm:px-12 lg:px-24 pt-20 pb-12"
       >
         <div className="max-w-6xl mx-auto w-full my-auto space-y-10">
-          <div className="border-b border-zinc-900 pb-5">
-            <p className="font-mono text-xs uppercase tracking-widest text-zinc-500">
+          <div className="border-b border-slate-800/80 pb-5">
+            <p className="font-mono text-xs uppercase tracking-widest text-sky-400/90">
               {lang === 'fr' ? '05 / Contact & Mobilité 2027' : '05 / Contact & 2027 Internship'}
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold text-zinc-100 mt-1">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mt-1">
               {lang === 'fr' ? 'Échanger autour d’une opportunité de stage' : 'Discuss an Internship Opportunity'}
             </h2>
           </div>
 
           <div className="grid lg:grid-cols-12 gap-10 items-start">
-            {/* Informations Stage & Coordonnées (5 colonnes) */}
             <div className="lg:col-span-5 space-y-6">
-              <div className="bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 space-y-4">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 space-y-4 shadow-md">
                 <div className="flex items-center gap-2">
                   <span className="h-2 w-2 rounded-full bg-emerald-400" />
                   <span className="font-mono text-xs uppercase tracking-wider text-emerald-400">
@@ -1196,77 +1180,77 @@ export default function PortfolioDeck() {
                   </span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                   {lang === 'fr'
                     ? 'Dans le cadre de la validation de ma troisième année de BUT Informatique, je recherche un stage de 13 semaines en développement Full-Stack, Backend ou Logiciel.'
                     : 'To complete my third year of B.Sc. in Computer Science, I am seeking a 13-week internship in Full-Stack, Backend, or Software Engineering.'}
                 </p>
 
-                <div className="space-y-2 pt-2 border-t border-zinc-800/80 text-xs">
+                <div className="space-y-2 pt-2 border-t border-slate-800 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-zinc-500 font-mono">
+                    <span className="text-slate-400 font-mono">
                       {lang === 'fr' ? 'Mobilité Europe' : 'European Mobility'}
                     </span>
-                    <span className="text-zinc-200 font-medium">
+                    <span className="text-slate-100 font-medium">
                       {lang === 'fr' ? 'Pologne · Portugal (Bourse Erasmus+)' : 'Poland · Portugal (Erasmus+ Grant)'}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-500 font-mono">
+                    <span className="text-slate-400 font-mono">
                       {lang === 'fr' ? 'Mobilité France' : 'France'}
                     </span>
-                    <span className="text-zinc-200 font-medium">Amiens · Lille · Paris</span>
+                    <span className="text-slate-100 font-medium">Amiens · Lille · Paris</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-500 font-mono">
+                    <span className="text-slate-400 font-mono">
                       {lang === 'fr' ? 'Langues de travail' : 'Working Languages'}
                     </span>
-                    <span className="text-zinc-200 font-medium">
+                    <span className="text-slate-100 font-medium">
                       {lang === 'fr' ? 'Français · Anglais' : 'English · French'}
                     </span>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-zinc-950 border border-zinc-900 rounded-xl p-6 space-y-4 text-xs">
-                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                  <span className="font-mono text-zinc-500">Email</span>
+              <div className="bg-slate-900/35 border border-slate-800/80 rounded-xl p-6 space-y-4 text-xs">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <span className="font-mono text-slate-400">Email</span>
                   <a
                     href="mailto:vermeulen.come@gmail.com"
-                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                    className="font-mono text-slate-100 hover:text-sky-400 transition-colors"
                   >
                     vermeulen.come@gmail.com
                   </a>
                 </div>
-                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                  <span className="font-mono text-zinc-500">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <span className="font-mono text-slate-400">
                     {lang === 'fr' ? 'Téléphone' : 'Phone'}
                   </span>
                   <a
                     href="tel:+33769951415"
-                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                    className="font-mono text-slate-100 hover:text-sky-400 transition-colors"
                   >
                     +33 7 69 95 14 15
                   </a>
                 </div>
-                <div className="flex items-center justify-between border-b border-zinc-900 pb-3">
-                  <span className="font-mono text-zinc-500">GitHub</span>
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                  <span className="font-mono text-slate-400">GitHub</span>
                   <a
                     href="https://github.com/Meqle"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                    className="font-mono text-slate-100 hover:text-sky-400 transition-colors"
                   >
                     github.com/Meqle ↗
                   </a>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-zinc-500">LinkedIn</span>
+                  <span className="font-mono text-slate-400">LinkedIn</span>
                   <a
                     href="https://www.linkedin.com/in/c%C3%B4me-vermeulen-4b601a38b/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-mono text-zinc-200 hover:text-cyan-400 transition-colors"
+                    className="font-mono text-slate-100 hover:text-sky-400 transition-colors"
                   >
                     linkedin.com/in/côme-vermeulen ↗
                   </a>
@@ -1274,15 +1258,14 @@ export default function PortfolioDeck() {
               </div>
             </div>
 
-            {/* Formulaire direct (7 colonnes) */}
             <div className="lg:col-span-7">
               <form
                 onSubmit={handleSubmit}
-                className="bg-zinc-900/30 border border-zinc-800/90 rounded-xl p-6 sm:p-8 space-y-5"
+                className="bg-slate-900/50 border border-slate-800 rounded-xl p-6 sm:p-8 space-y-5 shadow-md"
               >
                 <div className="grid sm:grid-cols-2 gap-5">
                   <div className="space-y-2">
-                    <label htmlFor="name" className="block font-mono text-[11px] uppercase text-zinc-400">
+                    <label htmlFor="name" className="block font-mono text-[11px] uppercase text-slate-400">
                       {lang === 'fr' ? 'Nom / Entreprise' : 'Name / Company'}
                     </label>
                     <input
@@ -1292,11 +1275,11 @@ export default function PortfolioDeck() {
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                       placeholder={lang === 'fr' ? 'Votre nom ou organisation' : 'Your name or company'}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full bg-[#0b1120] border border-slate-700/80 rounded-md px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label htmlFor="email" className="block font-mono text-[11px] uppercase text-zinc-400">
+                    <label htmlFor="email" className="block font-mono text-[11px] uppercase text-slate-400">
                       {lang === 'fr' ? 'Adresse email' : 'Email address'}
                     </label>
                     <input
@@ -1306,13 +1289,13 @@ export default function PortfolioDeck() {
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                       placeholder="contact@company.com"
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500 transition-colors"
+                      className="w-full bg-[#0b1120] border border-slate-700/80 rounded-md px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="message" className="block font-mono text-[11px] uppercase text-zinc-400">
+                  <label htmlFor="message" className="block font-mono text-[11px] uppercase text-slate-400">
                     Message
                   </label>
                   <textarea
@@ -1326,14 +1309,14 @@ export default function PortfolioDeck() {
                         ? 'Proposition de stage, échange technique...'
                         : 'Internship opportunity, technical inquiry...'
                     }
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-md px-3.5 py-2.5 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-cyan-500 transition-colors resize-none"
+                    className="w-full bg-[#0b1120] border border-slate-700/80 rounded-md px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-400 transition-colors resize-none"
                   />
                 </div>
 
                 <div className="flex items-center justify-between gap-4">
                   <button
                     type="submit"
-                    className="bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs sm:text-sm px-6 py-3 rounded-md transition-colors"
+                    className="bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm px-6 py-3 rounded-md transition-colors"
                   >
                     {lang === 'fr' ? 'Envoyer le message' : 'Send message'}
                   </button>
@@ -1349,13 +1332,12 @@ export default function PortfolioDeck() {
           </div>
         </div>
 
-        {/* Pied de page minimaliste intégré au dernier écran */}
-        <footer className="max-w-6xl mx-auto w-full pt-12 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-zinc-500">
+        <footer className="max-w-6xl mx-auto w-full pt-12 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-400">
           <div>Côme Vermeulen — {lang === 'fr' ? 'IUT d’Amiens' : 'Amiens, France'}</div>
           <button
             type="button"
             onClick={() => scrollToSection(0)}
-            className="hover:text-zinc-300 transition-colors"
+            className="hover:text-sky-400 transition-colors"
           >
             {lang === 'fr' ? 'Retour en haut ↑' : 'Back to top ↑'}
           </button>
@@ -1370,9 +1352,9 @@ export default function PortfolioDeck() {
           onMouseEnter={handleBottomZoneEnter}
           onMouseLeave={handleBottomZoneLeave}
           onClick={() => scrollToSection(activeSection + 1)}
-          className="fixed bottom-0 inset-x-0 z-40 h-12 bg-gradient-to-t from-zinc-950 via-zinc-950/90 to-transparent cursor-pointer flex flex-col justify-end group"
+          className="fixed bottom-0 inset-x-0 z-40 h-12 bg-gradient-to-t from-[#0b1120] via-[#0b1120]/90 to-transparent cursor-pointer flex flex-col justify-end group"
         >
-          <div className="max-w-7xl mx-auto w-full px-6 pb-2.5 flex items-center justify-between text-[11px] font-mono text-zinc-500 group-hover:text-zinc-200 transition-colors">
+          <div className="max-w-7xl mx-auto w-full px-6 pb-2.5 flex items-center justify-between text-[11px] font-mono text-slate-400 group-hover:text-slate-100 transition-colors">
             <span>
               {lang === 'fr'
                 ? `Suivant : ${sections[activeSection + 1].num} — ${sections[activeSection + 1].label}`
@@ -1384,13 +1366,14 @@ export default function PortfolioDeck() {
                   ? 'Pointez ici ou défilez pour continuer'
                   : 'Point here or scroll to advance'}
               </span>
-              <span className="inline-block transform group-hover:translate-y-0.5 transition-transform">↓</span>
+              <span className="inline-block transform group-hover:translate-y-0.5 transition-transform text-sky-400">
+                ↓
+              </span>
             </span>
           </div>
-          {/* Barre de progression au survol */}
-          <div className="w-full h-0.5 bg-zinc-900 overflow-hidden">
+          <div className="w-full h-0.5 bg-slate-800 overflow-hidden">
             <div
-              className="h-full bg-cyan-400 transition-none"
+              className="h-full bg-sky-400 transition-none"
               style={{ width: `${hoverProgress}%` }}
             />
           </div>
