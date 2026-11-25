@@ -1,6 +1,6 @@
 # Portfolio — Côme Vermeulen
 
-Code source de mon portfolio personnel, déployé sur [portfolio-but2.vercel.app](https://portfolio-but2.vercel.app).
+Code source de mon portfolio personnel, déployé sur [come-vermeulen.vercel.app](https://come-vermeulen.vercel.app).
 
 ## Stack technique
 

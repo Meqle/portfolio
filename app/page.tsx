@@ -10,6 +10,7 @@ export default function PortfolioDeck() {
   const [activeSection, setActiveSection] = useState(0);
   const [activeProject, setActiveProject] = useState(0);
   const [activePinkTab, setActivePinkTab] = useState(0);
+  const [activeTaskflowTab, setActiveTaskflowTab] = useState(0);
   const [hoverProgress, setHoverProgress] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 500, y: 300 });
 
@@ -450,6 +451,33 @@ export default function PortfolioDeck() {
           },
         ];
 
+  const taskflowScreenshots =
+    lang === 'fr'
+      ? [
+          {
+            label: '01. Tableau Kanban',
+            src: '/taskflow-kanban.png',
+            caption: 'Tableau Kanban Vue 3 avec filtrage par assigné, priorité, sous-tâches et glisser-déposer.',
+          },
+          {
+            label: '02. Connexion Multi-Tenant',
+            src: '/taskflow-login.png',
+            caption: 'Authentification JWT avec bascule rapide entre organisations isolées (Acme Corp, Globex) et rôles RBAC.',
+          },
+        ]
+      : [
+          {
+            label: '01. Kanban Board',
+            src: '/taskflow-kanban.png',
+            caption: 'Vue 3 Kanban board featuring assignee and priority filters, subtask tracking, and drag-and-drop.',
+          },
+          {
+            label: '02. Multi-Tenant Login',
+            src: '/taskflow-login.png',
+            caption: 'JWT authentication with isolated tenant organizations (Acme Corp, Globex) and RBAC role separation.',
+          },
+        ];
+
   const currentProject = projects[activeProject];
 
   return (
@@ -745,7 +773,84 @@ export default function PortfolioDeck() {
                 ))}
               </div>
 
-              {currentProject.archNodes.length > 0 ? (
+              {activeProject === 2 ? (
+                <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                      {lang === 'fr' ? 'Captures & Architecture' : 'Screenshots & Architecture'}
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {taskflowScreenshots.map((shot, sIdx) => (
+                        <button
+                          key={shot.label}
+                          type="button"
+                          onClick={() => setActiveTaskflowTab(sIdx)}
+                          className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                            activeTaskflowTab === sIdx
+                              ? 'bg-sky-500 text-slate-950 font-semibold'
+                              : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          {shot.label}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setActiveTaskflowTab(2)}
+                        className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                          activeTaskflowTab === 2
+                            ? 'bg-sky-500 text-slate-950 font-semibold'
+                            : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {lang === 'fr' ? '03. Topologie' : '03. Topology'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {activeTaskflowTab < 2 ? (
+                    <>
+                      <div className="relative h-56 sm:h-64 w-full rounded border border-slate-800 bg-slate-900 overflow-hidden">
+                        <Image
+                          src={taskflowScreenshots[activeTaskflowTab].src}
+                          alt={taskflowScreenshots[activeTaskflowTab].label}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 700px"
+                          className="object-contain p-2"
+                        />
+                      </div>
+                      <p className="text-xs text-slate-400 font-mono">
+                        {taskflowScreenshots[activeTaskflowTab].caption}
+                      </p>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-end">
+                        <code className="font-mono text-[11px] text-sky-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800">
+                          $ {currentProject.command}
+                        </code>
+                      </div>
+                      <div className="grid sm:grid-cols-4 gap-2.5">
+                        {currentProject.archNodes.map((node, i) => (
+                          <div
+                            key={node.title}
+                            className="relative bg-slate-900/90 border border-slate-800 rounded-md p-3 flex flex-col justify-between"
+                          >
+                            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
+                              <span>0{i + 1}</span>
+                              {i < currentProject.archNodes.length - 1 && (
+                                <span className="hidden sm:inline text-sky-500/70">→</span>
+                              )}
+                            </div>
+                            <div className="text-xs font-semibold text-slate-100">{node.title}</div>
+                            <div className="text-[11px] font-mono text-slate-400 mt-1">{node.detail}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : currentProject.archNodes.length > 0 ? (
                 <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
