@@ -9,6 +9,8 @@ export default function PortfolioDeck() {
   const { lang } = useLanguage();
   const [activeSection, setActiveSection] = useState(0);
   const [activeProject, setActiveProject] = useState(0);
+  const [activeMmorpgTab, setActiveMmorpgTab] = useState(0);
+  const [activeBombermanTab, setActiveBombermanTab] = useState(0);
   const [activePinkTab, setActivePinkTab] = useState(0);
   const [activeTaskflowTab, setActiveTaskflowTab] = useState(0);
   const [hoverProgress, setHoverProgress] = useState(0);
@@ -451,6 +453,60 @@ export default function PortfolioDeck() {
           },
         ];
 
+  const mmorpgScreenshots =
+    lang === 'fr'
+      ? [
+          {
+            label: '01. Cité de l’Agora',
+            src: '/mmorpg-agora.jpg',
+            caption: 'Place centrale de l’Agora avec mini-carte temps réel, suivi des quêtes et barre de compétences PixiJS.',
+          },
+          {
+            label: '02. Quartier & Taverne',
+            src: '/mmorpg-taverne.jpg',
+            caption: 'Exploration en vue de dessus avec transitions de zones, PNJ interactifs et bâtiments accessibles.',
+          },
+          {
+            label: '03. Port & Infirmerie',
+            src: '/mmorpg-port.jpg',
+            caption: 'Zone portuaire et quêtes locales rendues en 2D WebGL avec synchronisation WebSocket multijoueur.',
+          },
+        ]
+      : [
+          {
+            label: '01. Agora Square',
+            src: '/mmorpg-agora.jpg',
+            caption: 'Central Agora plaza featuring real-time minimap, quest tracker, and PixiJS skill bar HUD.',
+          },
+          {
+            label: '02. Tavern District',
+            src: '/mmorpg-taverne.jpg',
+            caption: 'Top-down world exploration with zone transitions, interactive NPCs, and enterable interiors.',
+          },
+          {
+            label: '03. Harbor & Infirmary',
+            src: '/mmorpg-port.jpg',
+            caption: 'Harbor district rendered in 2D WebGL with real-time multiplayer WebSocket synchronization.',
+          },
+        ];
+
+  const bombermanScreenshots =
+    lang === 'fr'
+      ? [
+          {
+            label: '01. Client Electron',
+            src: '/bomberman-lobby.png',
+            caption: 'Application de bureau Electron connectée en temps réel au serveur Socket.io conteneurisé sous Docker.',
+          },
+        ]
+      : [
+          {
+            label: '01. Electron Client',
+            src: '/bomberman-lobby.png',
+            caption: 'Cross-platform Electron desktop client connected in real time to the Dockerized Socket.io server.',
+          },
+        ];
+
   const taskflowScreenshots =
     lang === 'fr'
       ? [
@@ -773,7 +829,156 @@ export default function PortfolioDeck() {
                 ))}
               </div>
 
-              {activeProject === 2 ? (
+              {activeProject === 0 ? (
+                <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                      {lang === 'fr' ? 'Captures en jeu & Architecture' : 'In-Game Screenshots & Architecture'}
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {mmorpgScreenshots.map((shot, sIdx) => (
+                        <button
+                          key={shot.label}
+                          type="button"
+                          onClick={() => setActiveMmorpgTab(sIdx)}
+                          className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                            activeMmorpgTab === sIdx
+                              ? 'bg-sky-500 text-slate-950 font-semibold'
+                              : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                          }`}
+                        >
+                          {shot.label}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        onClick={() => setActiveMmorpgTab(3)}
+                        className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                          activeMmorpgTab === 3
+                            ? 'bg-sky-500 text-slate-950 font-semibold'
+                            : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {lang === 'fr' ? '04. Topologie' : '04. Topology'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {activeMmorpgTab < 3 ? (
+                    <>
+                      <div className="relative h-56 sm:h-64 w-full rounded border border-slate-800 bg-slate-900 overflow-hidden">
+                        <Image
+                          src={mmorpgScreenshots[activeMmorpgTab].src}
+                          alt={mmorpgScreenshots[activeMmorpgTab].label}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 700px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <p className="text-xs text-slate-400 font-mono">
+                        {mmorpgScreenshots[activeMmorpgTab].caption}
+                      </p>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-end">
+                        <code className="font-mono text-[11px] text-sky-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800">
+                          $ {currentProject.command}
+                        </code>
+                      </div>
+                      <div className="grid sm:grid-cols-4 gap-2.5">
+                        {currentProject.archNodes.map((node, i) => (
+                          <div
+                            key={node.title}
+                            className="relative bg-slate-900/90 border border-slate-800 rounded-md p-3 flex flex-col justify-between"
+                          >
+                            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
+                              <span>0{i + 1}</span>
+                              {i < currentProject.archNodes.length - 1 && (
+                                <span className="hidden sm:inline text-sky-500/70">→</span>
+                              )}
+                            </div>
+                            <div className="text-xs font-semibold text-slate-100">{node.title}</div>
+                            <div className="text-[11px] font-mono text-slate-400 mt-1">{node.detail}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : activeProject === 1 ? (
+                <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
+                      {lang === 'fr' ? 'Aperçu Client & Architecture' : 'Client Preview & Architecture'}
+                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setActiveBombermanTab(0)}
+                        className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                          activeBombermanTab === 0
+                            ? 'bg-sky-500 text-slate-950 font-semibold'
+                            : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {bombermanScreenshots[0].label}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveBombermanTab(1)}
+                        className={`px-2.5 py-1 rounded text-[11px] font-mono transition-colors ${
+                          activeBombermanTab === 1
+                            ? 'bg-sky-500 text-slate-950 font-semibold'
+                            : 'bg-slate-900 text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        {lang === 'fr' ? '02. Topologie & Tests' : '02. Topology & Tests'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {activeBombermanTab === 0 ? (
+                    <>
+                      <div className="relative h-56 sm:h-64 w-full rounded border border-slate-800 bg-slate-900 overflow-hidden">
+                        <Image
+                          src={bombermanScreenshots[0].src}
+                          alt={bombermanScreenshots[0].label}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 700px"
+                          className="object-contain p-2"
+                        />
+                      </div>
+                      <p className="text-xs text-slate-400 font-mono">{bombermanScreenshots[0].caption}</p>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-end">
+                        <code className="font-mono text-[11px] text-sky-400 bg-slate-900 px-2.5 py-0.5 rounded border border-slate-800">
+                          $ {currentProject.command}
+                        </code>
+                      </div>
+                      <div className="grid sm:grid-cols-4 gap-2.5">
+                        {currentProject.archNodes.map((node, i) => (
+                          <div
+                            key={node.title}
+                            className="relative bg-slate-900/90 border border-slate-800 rounded-md p-3 flex flex-col justify-between"
+                          >
+                            <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
+                              <span>0{i + 1}</span>
+                              {i < currentProject.archNodes.length - 1 && (
+                                <span className="hidden sm:inline text-sky-500/70">→</span>
+                              )}
+                            </div>
+                            <div className="text-xs font-semibold text-slate-100">{node.title}</div>
+                            <div className="text-[11px] font-mono text-slate-400 mt-1">{node.detail}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : activeProject === 2 ? (
                 <div className="bg-[#0b1120]/90 border border-slate-800 rounded-lg p-4 space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="font-mono text-[11px] uppercase tracking-wider text-slate-400">
