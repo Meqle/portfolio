@@ -1557,12 +1557,12 @@ export default function PortfolioDeck() {
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-slate-400">LinkedIn</span>
                   <a
-                    href="https://www.linkedin.com/in/c%C3%B4me-vermeulen-4b601a38b/"
+                    href="https://www.linkedin.com/in/come-vermeulen/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="font-mono text-slate-100 hover:text-sky-400 transition-colors"
                   >
-                    linkedin.com/in/côme-vermeulen ↗
+                    linkedin.com/in/come-vermeulen ↗
                   </a>
                 </div>
               </div>
