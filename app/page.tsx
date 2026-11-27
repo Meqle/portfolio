@@ -1189,7 +1189,9 @@ export default function PortfolioDeck() {
             </div>
 
             <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
-              <div className="font-mono text-xs text-sky-400">02 / BACKEND & RÉSEAU</div>
+              <div className="font-mono text-xs text-sky-400">
+                {lang === 'fr' ? '02 / BACKEND & RÉSEAU' : '02 / BACKEND & NETWORK'}
+              </div>
               <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Serveurs, API & Temps Réel' : 'Servers, APIs & Real-Time'}
               </h3>
@@ -1218,7 +1220,9 @@ export default function PortfolioDeck() {
             </div>
 
             <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
-              <div className="font-mono text-xs text-sky-400">03 / DONNÉES</div>
+              <div className="font-mono text-xs text-sky-400">
+                {lang === 'fr' ? '03 / DONNÉES' : '03 / DATABASES'}
+              </div>
               <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Bases SQL & NoSQL' : 'SQL & NoSQL Databases'}
               </h3>
@@ -1233,21 +1237,23 @@ export default function PortfolioDeck() {
                 </li>
                 <li className="flex justify-between border-b border-slate-800 pb-1.5">
                   <span>MySQL / MariaDB</span>
-                  <span className="text-slate-400">Relationnel</span>
+                  <span className="text-slate-400">{lang === 'fr' ? 'Relationnel' : 'Relational'}</span>
                 </li>
                 <li className="flex justify-between border-b border-slate-800 pb-1.5">
-                  <span>Isolation Multi-Tenant</span>
+                  <span>{lang === 'fr' ? 'Isolation Multi-Tenant' : 'Multi-Tenant Isolation'}</span>
                   <span className="text-slate-400">SaaS</span>
                 </li>
                 <li className="flex justify-between">
-                  <span>JWT & Rôles RBAC</span>
-                  <span className="text-slate-400">Sécurité</span>
+                  <span>{lang === 'fr' ? 'JWT & Rôles RBAC' : 'JWT & RBAC Roles'}</span>
+                  <span className="text-slate-400">{lang === 'fr' ? 'Sécurité' : 'Security'}</span>
                 </li>
               </ul>
             </div>
 
             <div className="bg-slate-900/60 border border-slate-800/90 rounded-xl p-6 space-y-4 shadow-md">
-              <div className="font-mono text-xs text-sky-400">04 / DEVOPS & QUALITÉ</div>
+              <div className="font-mono text-xs text-sky-400">
+                {lang === 'fr' ? '04 / DEVOPS & QUALITÉ' : '04 / DEVOPS & QUALITY'}
+              </div>
               <h3 className="text-base font-semibold text-white">
                 {lang === 'fr' ? 'Industrialisation & Tests' : 'Containers & Testing'}
               </h3>
@@ -1261,7 +1267,7 @@ export default function PortfolioDeck() {
                   <span className="text-slate-400">Shared Types</span>
                 </li>
                 <li className="flex justify-between border-b border-slate-800 pb-1.5">
-                  <span>Tests Automatisés</span>
+                  <span>{lang === 'fr' ? 'Tests Automatisés' : 'Automated Testing'}</span>
                   <span className="text-slate-400">TDD · BDD</span>
                 </li>
                 <li className="flex justify-between border-b border-slate-800 pb-1.5">
@@ -1564,7 +1570,7 @@ export default function PortfolioDeck() {
                     github.com/Meqle ↗
                   </a>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
                   <span className="font-mono text-slate-400">LinkedIn</span>
                   <a
                     href="https://www.linkedin.com/in/come-vermeulen/"
@@ -1573,6 +1579,19 @@ export default function PortfolioDeck() {
                     className="font-mono text-slate-100 hover:text-sky-400 transition-colors"
                   >
                     linkedin.com/in/come-vermeulen ↗
+                  </a>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-slate-400">
+                    {lang === 'fr' ? 'CV (PDF)' : 'Resume (PDF)'}
+                  </span>
+                  <a
+                    href={lang === 'fr' ? '/CV_Come_Vermeulen_FR.pdf' : '/CV_Come_Vermeulen_EN.pdf'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-mono text-sky-400 hover:text-sky-300 transition-colors"
+                  >
+                    {lang === 'fr' ? 'Télécharger (FR) ↓' : 'Download (EN) ↓'}
                   </a>
                 </div>
               </div>
