@@ -651,6 +651,14 @@ export default function PortfolioDeck() {
                 {lang === 'fr' ? 'Me contacter pour un stage' : 'Contact for internship'}
               </button>
               <a
+                href={lang === 'fr' ? '/CV_Come_Vermeulen_FR.pdf' : '/CV_Come_Vermeulen_EN.pdf'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-slate-900/60 hover:bg-slate-800 text-sky-400 hover:text-sky-300 font-mono text-xs px-4 py-3 rounded-md border border-slate-700/80 transition-colors"
+              >
+                {lang === 'fr' ? 'Télécharger le CV (PDF) ↓' : 'Download Resume (PDF) ↓'}
+              </a>
+              <a
                 href="https://github.com/Meqle"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -674,7 +682,9 @@ export default function PortfolioDeck() {
                 <div className="font-mono text-xs text-slate-400">
                   {lang === 'fr' ? 'Dominante' : 'Focus'}
                 </div>
-                <div className="text-sm font-medium text-slate-100 mt-1">Full-Stack & Temps Réel</div>
+                <div className="text-sm font-medium text-slate-100 mt-1">
+                  {lang === 'fr' ? 'Full-Stack & Temps Réel' : 'Full-Stack & Real-Time'}
+                </div>
               </div>
               <div>
                 <div className="font-mono text-xs text-slate-400">
@@ -697,14 +707,14 @@ export default function PortfolioDeck() {
 
           {/* Colonne Portrait */}
           <div className="lg:col-span-4 flex justify-center lg:justify-end">
-            <div className="relative w-56 h-64 sm:w-64 sm:h-72 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-900 shadow-2xl shadow-slate-950/60">
+            <div className="relative w-56 h-72 sm:w-64 sm:h-80 rounded-xl overflow-hidden border border-slate-700/80 bg-slate-900 shadow-2xl shadow-slate-950/60">
               <Image
                 src="/come-photo.jpg"
                 alt="Côme Vermeulen"
                 fill
                 sizes="(max-width: 768px) 224px, 256px"
                 priority
-                className="object-cover transition-transform duration-500 hover:scale-105"
+                className="object-cover object-[50%_12%] transition-transform duration-500 hover:scale-105"
               />
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0b1120]/95 via-[#0b1120]/45 to-transparent p-4">
                 <p className="font-mono text-[11px] text-slate-100">Côme Vermeulen</p>
